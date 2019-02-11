@@ -1,0 +1,23 @@
+"Empty username/email field"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue ERROR
+
+"Empty Password field"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue ERROR
+
+"Enter Wrong Password for existing user"
+EXPECTED:Invalid Username/Email or Password Dialogue
+ACTUAL:Invalid Username/Email or Password Dialogue
+
+"Login with valid username and password"
+EXPECTED: Redirection to user dashboard
+ACTUAL:	Redirection to user dashboard
+
+"Login with valid email and password"
+EXPECTED: Redirection to user dashboard
+ACTUAL:	Redirection to user dashboard
+
+
+//TODO
+Still need to implement forgot password features on login page

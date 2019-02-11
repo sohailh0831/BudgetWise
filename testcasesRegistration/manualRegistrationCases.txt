@@ -1,0 +1,42 @@
+"Empty First Name Field"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue Error
+
+"Empty Last Name Field"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue Error
+
+"Empty Email Field"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue Error
+
+"Email not containing '@' followed by '.' "
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue Error
+
+"Empty Username Field"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue Error
+
+"Empty Password Field"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue Error
+
+"Password less than four characters"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue Error
+
+"Password doesn't match Re-Enter password field"
+EXPECTED: Flash Dialogue Error
+ACTUAL: Flash Dialogue Error
+
+"Create testUser with valid name, email, username, and password"
+EXPECTED: Sucessfully registered dialogue and redirection to login page, also added to users table in database
+ACTUAL: Sucessfully registered dialogue and redirection to login page, also added to users table in database
+
+"Create new testUser with matching credentials as last testUser"
+EXPECTED: Flash Dialouge Error
+ACTUAL: Flash Dialogue Error
+
+//TODO
+Still need to implement further password checking restrictions including special characters and resuing old passwords
