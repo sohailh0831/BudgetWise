@@ -15,7 +15,6 @@
 						<div class="m-add_parental">
 							<button id="m_add_parental" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air m-login__btn m-login__btn--primary">Change Email</button>
 						</div> -->
-
 						<div class="wrapper">
 						<button class="but" id="m_change_email" type="button" class="btn m-btn--square  btn-success m-btn--wide">Change Email</button>
 						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
@@ -39,6 +38,16 @@
 								<span class="slider round"></span>
 							</label>
 						</div>
+						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+						<select>
+							<option selected disabled hidden>Color of categories</option>
+							<option value="Red">Red</option>
+							<option value="Blue">Blue</option>
+							<option value="Green">Green</option>
+							<option value="Purple">Purple</option>
+						</select>
+						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+						<button class="dangerBut" type="button" class="btn m-btn--square  btn-warning m-btn--wide">Delete Account</button>
 						</div>
 						<!--End::Main Portlet-->
 					</div>
@@ -50,6 +59,15 @@
 		 /* display: block; */
 		padding:10px 3px 10px 3px;
     background-color:#00cc00;
+    display: block;
+    border-radius:10px;
+    margin-top: 100px;
+		margin: 0 auto;
+  }
+	.dangerBut {
+		 /* display: block; */
+		padding:10px 3px 10px 3px;
+    background-color:#ff0000;
     display: block;
     border-radius:10px;
     margin-top: 100px;
@@ -71,7 +89,7 @@
 	}
 	.sliderWrapper{
 		display: inline-block;
-		margin:24px 24px 24px 24px;
+		margin: 0px 24px 0px 24px;
 		postion:relative;
 	}
   .sliderWrapper div{
