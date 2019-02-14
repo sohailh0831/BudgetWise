@@ -1,7 +1,8 @@
 {{> header}}
-				<div class="m-grid__item m-grid__item--fluid m-wrapper">
+				<div class="m-grid__item m-grid__item--fluid m-wrapper" style="text-align:center">
 
-					<div class="m-content">
+
+					<!-- <div class="m-content">
 						<div class="m-change_email">
 							<button id="m_change_email" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air m-login__btn m-login__btn--primary">Change Email</button>
 						</div>
@@ -13,14 +14,31 @@
 						</div>
 						<div class="m-add_parental">
 							<button id="m_add_parental" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air m-login__btn m-login__btn--primary">Change Email</button>
+						</div> -->
+
+						<div class="wrapper">
+						<button class="but" id="m_change_email" type="button" class="btn m-btn--square  btn-success m-btn--wide">Change Email</button>
+						<button class="but" id="m_change_password" type="button" class="btn m-btn--square  btn-success m-btn--wide">Change Password</button>
+						<button class="but" id="m_manage_notifications" type="button" class="btn m-btn--square  btn-success m-btn--wide">Manage Notifications</button>
+						<button class="but" id="m_add_parental" type="button" class="btn m-btn--square  btn-success m-btn--wide">Add parental</button>
 						</div>
-
-
-
-
-
-
 						<!--End::Main Portlet-->
 					</div>
 				</div>
 			{{> footer}}
+
+<style>
+  .but {
+		 /* display: block; */
+		 padding:10px 3px 10px 3px;
+    background-color:#FEC7FD;
+    display: block;
+    border-radius:10px;
+    margin-top: 250px;
+		margin: 0 auto;
+  }
+	.wrapper {
+    text-align: center;
+		margin-top: 250px;
+}
+</style>
