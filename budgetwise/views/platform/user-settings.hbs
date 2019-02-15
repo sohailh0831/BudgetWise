@@ -1,6 +1,6 @@
 {{> header}}
 				<div class="m-grid__item m-grid__item--fluid m-wrapper" style="text-align:center">
-						<div class="wrapper">
+						<div class="wrapper" id="Div1">
 						<img src="../../assets/app/media/img/misc/Settings.png">
 						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
 						<button class="but" id="m_change_email" type="button" class="btn m-btn--square  btn-success m-btn--wide">Change Email</button>
@@ -21,7 +21,7 @@
 						<div class="sliderWrapper">
 							<div>Light/Dark Theme&nbsp;&nbsp;</div>
 							<label class="switch">
-								<input type="checkbox">
+								<input type="checkbox" onclick="toggleClick()">
 								<span class="slider round"></span>
 							</label>
 						</div>
@@ -34,13 +34,25 @@
 							<option value="Purple">Purple</option>
 						</select>
 						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
-						<button class="dangerBut" type="button" class="btn m-btn--square  btn-warning m-btn--wide">Delete Account</button>
+						<button class="dangerBut" type="button" class="btn m-btn--square  btn-warning m-btn--wide" onclick="deleteClick()">Delete Account</button>
 						</div>
 						<!--End::Main Portlet-->
 					</div>
 				</div>
 			{{> footer}}
-
+<script>
+function toggleClick() {
+	if(document.getElementById("Div1").style.backgroundColor==="rgb(0, 115, 230)") {
+		document.getElementById("Div1").style.backgroundColor="#ffffff";
+	}
+	else {
+  	document.getElementById("Div1").style.backgroundColor="#0073e6";
+	}
+}
+function deleteClick() {
+	var result = confirm("Are you sure you want to delete your account?");
+}
+</script>
 <style>
   .but {
 		 /* display: block; */
