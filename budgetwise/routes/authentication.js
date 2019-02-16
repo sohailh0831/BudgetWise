@@ -118,11 +118,46 @@ router.get('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, (
   return res.send('Forgot Password Page');
 });
 
+router.post('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
+  let userEmail = req.body.username;
+  let formErrors = req.validationErrors();
+  if (formErrors) {
+      req.flash('error', formErrors[0].msg);
+      return res.redirect('/forgot-password');
+  }
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE username=${mysql.escape(userEmail)} OR email=${mysql.escape(userEmail)};`, (error, results, fields) => {
+    if (error) {
+      console.log(error.stack);
+      con.end();
+      return res.send();
+    }
+    if (results.length === 0) {
+      req.flash('error', "This username or email has not been registered.");
+      con.end();
+      return res.redirect('/forgot-password');
+    } else {
+      // TODO: Email user with link to reset password.
+    }
+  }
+});
+
 router.get('/reset-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
   return res.send('Reset Password Page');
 });
 
-
+router.post('/reset-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
+  let oldPassword = req.body.oldPassword;
+  let newPassword = req.body.newPassword;
+  let newPassword2 = req.body.newPassword2;
+  let formErrors = req.validationErrors();
+  if (formErrors) {
+      req.flash('error', formErrors[0].msg);
+      return res.redirect('/forgot-password');
+  }
+  let con = mysql.createConnection(dbInfo);
+  // TODO: Implement database password replacement.
+});
 
 
 passport.use(new LocalStrategy({passReqToCallback: true,},
