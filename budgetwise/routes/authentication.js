@@ -115,7 +115,10 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
 
 // Register Route
 router.get('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
-  return res.send('Forgot Password Page');
+  return res.render('platform/forgot-password.hbs', {
+    error: req.flash('error'),
+    success: req.flash('success')
+  });
 });
 
 router.post('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
@@ -143,7 +146,10 @@ router.post('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, 
 });
 
 router.get('/reset-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
-  return res.send('Reset Password Page');
+  return res.render('platform/forgot-password.hbs', {
+    error: req.flash('error'),
+    success: req.flash('success')
+  });
 });
 
 router.post('/reset-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
