@@ -114,6 +114,10 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
 });
 
 // Register Route
+router.get('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
+  return res.send('Forgot Password Page');
+});
+
 router.get('/reset-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
   return res.send('Reset Password Page');
 });
