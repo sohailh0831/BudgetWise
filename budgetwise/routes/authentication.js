@@ -96,7 +96,8 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
       if (results.length === 0) {
         let salt = bcrypt.genSaltSync(10);
         let hashedPassword = bcrypt.hashSync(req.body.password, salt);
-        con.query(`INSERT INTO users (id, email, username, password, first_name, last_name) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.body.email)}, ${mysql.escape(req.body.username)}, '${hashedPassword}', ${mysql.escape(req.body.firstName)}, ${mysql.escape(req.body.lastName)});`, (error, results, fields) => {
+        let userID = uuidv4();
+        con.query(`INSERT INTO users (id, email, username, password, first_name, last_name) VALUES (${mysql.escape(userID)}, ${mysql.escape(req.body.email)}, ${mysql.escape(req.body.username)}, '${hashedPassword}', ${mysql.escape(req.body.firstName)}, ${mysql.escape(req.body.lastName)});`, (error, results, fields) => {
           if (error) {
             console.log(error.stack);
             con.end();
@@ -104,9 +105,46 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
           }
           if (results) {
             console.log(`${req.body.email} successfully registered.`);
-            con.end();
-            req.flash('success', 'Successfully registered. You may now login.');
-            return res.redirect('/login');
+            // bills, travel, food, entertainment
+            let billsName = "Bills";
+            let billsID = uuidv4();
+            let travelName = "Travel";
+            let travelID = uuidv4();
+            let foodName = "Food";
+            let foodID = uuidv4();
+            let entertainmentName = "Entertainment";
+            let entertainmentID = uuidv4();
+            con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(billsID)}, ${mysql.escape(billsName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
+              if (error) {
+                  console.log(error.stack);
+                  con.end();
+                  return res.send();
+              }
+              con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(travelID)}, ${mysql.escape(travelName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
+                if (error) {
+                    console.log(error.stack);
+                    con.end();
+                    return res.send();
+                }
+                con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(foodID)}, ${mysql.escape(foodName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
+                  if (error) {
+                      console.log(error.stack);
+                      con.end();
+                      return res.send();
+                  }
+                  con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(entertainmentID)}, ${mysql.escape(entertainmentName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
+                    if (error) {
+                        console.log(error.stack);
+                        con.end();
+                        return res.send();
+                    }
+                    con.end();
+                    req.flash('success', 'Successfully registered. You may now login.');
+                    return res.redirect('/login');
+                  });
+                });
+              });
+            });
           } else {
             con.end();
             req.flash('error', 'Error Registering. Please try again.');
