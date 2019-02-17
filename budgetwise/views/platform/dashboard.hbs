@@ -9,95 +9,54 @@
 							<strong>Oh snap!</strong> {{error}}
 						</div>
 						{{/if}}
-  
+            {{#if success}}
+						<div class="alert alert-success alert-dismissible fade show" role="alert">
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							</button>
+							<strong>Success!</strong> {{success}}
+						</div>
+						{{/if}}
 
+
+
+            <div class="row">
+            
+            
+            
+            
+            
+            
+              <div class="col-lg-8">
+
+
+
+  							<div class="m-portlet m-portlet--tab">
+  									<div class="m-portlet__head">
+  										<div class="m-portlet__head-caption">
+  											<div class="m-portlet__head-title">
+  												<span class="m-portlet__head-icon m--hide">
+  													<i class="la la-gear"></i>
+  												</span>
+  												<h3 class="m-portlet__head-text">
+  													Pie Chart 1
+  												</h3>
+  											</div>
+  										</div>
+  									</div>
+  									<div class="m-portlet__body">
+  										<div id="m_flotcharts_8" style="height: 300px;"></div>
+  									</div>
+  								</div>
+
+
+
+  							</div>
+            </div>
 						<div class="row">
-							<div class="col-lg-12">
-								<!--begin::Portlet-->
-								<div class="m-portlet m-portlet--tab">
-									<div class="m-portlet__head">
-										<div class="m-portlet__head-caption">
-											<div class="m-portlet__head-title">
-												<span class="m-portlet__head-icon m--hide">
-													<i class="la la-gear"></i>
-												</span>
-												<h3 class="m-portlet__head-text">         
-												</h3>
-											</div>
-										</div>
-									</div>
-									<div class="m-portlet__body">
-                    <!-- Inserted chart here -->
-                         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-                         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-                          <body>
-                                <div class="container" >
-                                <canvas id="myChart" style="position: relative; height:20vh; width:20vw" ></canvas>
-                                </div>
-
-                                 <script>
-                                 var arrayValues = [65,35];
-                                 var labelValues = ['Spent', 'Left to Spend'];
-                                 let myChart = document.getElementById('myChart').getContext('2d');    
-                                 // Global Options
-                                 Chart.defaults.global.defaultFontFamily = 'Lato';
-                                 Chart.defaults.global.defaultFontSize = 18;
-                                 Chart.defaults.global.defaultFontColor = '#777';
-                                 let massPopChart = new Chart(myChart, {
-                                 type:'pie', // bar, horizontalBar, pie, line, doughnut, radar, polarArea
-                                 data:{
-                                 labels:labelValues,
-                                 datasets:[{
-                                 label:'Budget',
-                                 data:arrayValues, // here is the data for the graph where we need sql
-          
-                                 backgroundColor:[ //colors of graph portions
-                                       'rgba(51, 51, 51, 0.6)',
-                                       'rgba(0, 0, 128, 0.8)',
-                                   ],
-                                  borderWidth:1,
-                                  borderColor:'#777',
-                                  hoverBorderWidth:5,
-                                  hoverBorderColor:'#000'
-                                   }]
-                                  },
-                                options:{
-                                      title:{
-                                      display:true,
-                                      text:'Monthly Budget',
-                                      fontSize:30
-                                  },
-                                legend:{
-                                       display:true,
-                                      position:'right',
-                                       labels:{
-                                    fontColor:'#000'
-                                }
-                               },
-                              layout:{
-                              padding:{
-                              left:0,
-                              right:0,
-                              bottom:0,
-                              top:0
-                              }
-                             },
-                              tooltips:{
-                                  enabled:true
-                                    }
-                                  }
-                                 });
-                        </script>
-                  </body>
-                             <!-- Ended chart here -->                    
-									</div>
-								</div>
-
-								<!--end::Portlet-->
-							</div>
 
 
-              <div class="col-lg-6">
+
+              <div class="col-lg-4">
 
                 <div class="m-portlet m-portlet--tab">
 									<div class="m-portlet__head">
@@ -114,16 +73,14 @@
 									</div>
 
 									<!--begin::Form-->
-									<form class="m-form m-form--fit m-form--label-align-right">
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-expense" method="post">
 										<div class="m-portlet__body">
 											<div class="form-group m-form__group">
 												<label for="exampleSelect1">Category</label>
 												<select class="form-control m-input m-input--square" id="exampleSelect1" name="category">
-													<option>1</option>
-													<option>2</option>
-													<option>3</option>
-													<option>4</option>
-													<option>5</option>
+                          {{#each categories}}
+                          <option value={{id}}>{{name}}</option>
+                          {{/each}}
 												</select>
 											</div>
                       <div class="form-group m-form__group">
@@ -158,8 +115,61 @@
 
 
 							</div>
-              
-              <div class="col-lg-6">
+
+
+
+							<div class="col-lg-4">
+
+                <div class="m-portlet m-portlet--tab">
+									<div class="m-portlet__head">
+										<div class="m-portlet__head-caption">
+											<div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+												<h3 class="m-portlet__head-text">
+													Create a Budget
+												</h3>
+											</div>
+										</div>
+									</div>
+
+									<!--begin::Form-->
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-category" method="post">
+										<div class="m-portlet__body">
+                    <div class="form-group m-form__group">
+												<label for="exampleSelect2">Categories</label>
+												<select multiple="" class="form-control m-input" id="exampleSelect2" disabled="true">
+													{{#each categories}}
+                          <option>{{name}}</option>
+                          {{/each}}
+												</select>
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Category Name</label>
+												<input type="text" class="form-control m-input m-input--square" name="categoryName" placeholder="Category Name">
+											</div>
+										</div>
+										<div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Create Category</button>
+											</div>
+										</div>
+									</form>
+
+									<!--end::Form-->
+								</div>
+
+
+							</div>
+
+
+
+
+
+							
+
+              <div class="col-lg-4">
 
                 <div class="m-portlet m-portlet--tab">
 									<div class="m-portlet__head">
@@ -176,16 +186,14 @@
 									</div>
 
 									<!--begin::Form-->
-									<form class="m-form m-form--fit m-form--label-align-right">
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-budget" method="post">
 										<div class="m-portlet__body">
                     <div class="form-group m-form__group">
 												<label for="exampleSelect2">Categories</label>
 												<select multiple="" class="form-control m-input" id="exampleSelect2" disabled="true">
-													<option>1</option>
-													<option>2</option>
-													<option>3</option>
-													<option>4</option>
-													<option>5</option>
+													{{#each categories}}
+                          <option>{{name}}</option>
+                          {{/each}}
 												</select>
 											</div>
                       <div class="form-group m-form__group">
@@ -214,3 +222,5 @@
 					</div>
 				</div>
 			{{> footer}}
+
+
