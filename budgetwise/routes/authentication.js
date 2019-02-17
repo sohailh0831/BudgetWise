@@ -9,12 +9,20 @@ const passport = require("passport");
 const flash = require('connect-flash');
 var request = require("request");
 const mysql = require('mysql');
+const nodemailer = require('nodemailer');
 let dbInfo = {
   host: "localhost",
   user: "root",
   password: "BudgetWise1234!",
   database : 'budgetwise'
 };
+let transporter = nodemailer.createTransport({
+ service: 'gmail',
+ auth: {
+        user: 'budgetwisepurdue@gmail.com',
+        pass: 'BudgetWise1234!'
+    }
+});
 
 const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../helper/Authentication');
@@ -58,7 +66,7 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
   let password = req.body.password;
   let confirmPassword = req.body.password2;
   console.log(req.body);
-  if (req.body.password.includes(' ') || req.body.password2.includes(' ')) {
+    if (req.body.password.includes(' ') || req.body.password2.includes(' ')) {
       req.flash('error', 'Password cannot contain spaces.');
       return res.redirect('/register');
     }
@@ -122,6 +130,8 @@ router.get('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, (
 });
 
 router.post('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
+  req.flash('success', "If this email exists in our system, you will get a password reset email.");
+  res.redirect('/forgot-password');
   let userEmail = req.body.username;
   let formErrors = req.validationErrors();
   if (formErrors) {
@@ -135,34 +145,112 @@ router.post('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, 
       con.end();
       return res.send();
     }
-    if (results.length === 0) {
-      req.flash('error', "This username or email has not been registered.");
-      con.end();
-      return res.redirect('/forgot-password');
+    if (results.length === 1) {
+      let randomID = uuidv4(); // get random new ID. this will be added to the password reset URL we email them so it's fulyl randomized and can't be bruteforced.
+      con.query(`UPDATE users SET forgot_password='${randomID}' WHERE username=${mysql.escape(userEmail)} OR email=${mysql.escape(userEmail)};`, (error, resultsUpdate, fields) => {
+        if (error) {
+          console.log(error.stack);
+          con.end();
+          return;
+        }
+          let passwordResetURL = `http://167.99.156.25/reset-password/${randomID}`;
+          let emailContent = `<p>Hi ${results[0].first_name} ${results[0].last_name},<br><br>Please use the following link to reset your password: ${passwordResetURL}</p><p><br>Best,</p><p>BudgetWise Team</p>`;
+          const mailOptions = {
+            from: 'budgetwisepurdue@gmail.com',
+            to: results[0].email,
+            subject: 'Password Reset for BudgetWise',
+            html: emailContent
+          };
+          transporter.sendMail(mailOptions, function (err, info) {
+             if(err)
+               console.log(err)
+             else
+               console.log(info);
+          });
+          con.end();
+      });
     } else {
-      // TODO: Email user with link to reset password.
+      con.end();
     }
-  }
-});
-
-router.get('/reset-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
-  return res.render('platform/forgot-password.hbs', {
-    error: req.flash('error'),
-    success: req.flash('success')
   });
 });
 
-router.post('/reset-password', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
-  let oldPassword = req.body.oldPassword;
+router.get('/reset-password/:resetPasswordID', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE forgot_password=${mysql.escape(req.params.resetPasswordID)};`, (error, results, fields) => {
+    if (error) {
+          console.log(error.stack);
+          con.end();
+          return;
+    }
+    if (results.length === 0) {
+      req.flash('error', 'Error.');
+      con.end();
+      return res.redirect('/login');
+    } else if (results.length === 1) {
+      con.end();
+      return res.render('platform/reset-password.hbs', {
+        resetPasswordID: req.params.resetPasswordID,
+        email: results[0].email,
+        error: req.flash('error'),
+      });
+    } else {
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/login');
+    }
+  });
+});
+
+router.post('/reset-password/:resetPasswordID', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
   let newPassword = req.body.newPassword;
   let newPassword2 = req.body.newPassword2;
-  let formErrors = req.validationErrors();
-  if (formErrors) {
-      req.flash('error', formErrors[0].msg);
-      return res.redirect('/forgot-password');
-  }
-  let con = mysql.createConnection(dbInfo);
-  // TODO: Implement database password replacement.
+  if (newPassword.includes(' ') || newPassword2.includes(' ')) {
+      req.flash('error', 'New Password cannot contain spaces.');
+      return res.redirect(`/reset-password/${req.params.resetPasswordID}`);
+    }
+    if (newPassword.length < 4 || newPassword2.length < 4) {
+      req.flash('error', 'Password must be longer than 3 characters.');
+      return res.redirect(`/reset-password/${req.params.resetPasswordID}`);
+    }
+    req.checkBody('newPassword', 'New password field is required.').notEmpty();
+    req.checkBody('newPassword2', 'Confirm New password field is required.').notEmpty();
+	  req.checkBody('newPassword2', 'New password does not match confirmation password field.').equals(req.body.newPassword);
+    let formErrors = req.validationErrors();
+    if (formErrors) {
+		    req.flash('error', formErrors[0].msg);
+        return res.redirect(`/reset-password/${req.params.resetPasswordID}`);
+	  }
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM users WHERE forgot_password=${mysql.escape(req.params.resetPasswordID)};`, (error, results, fields) => {
+      if (error) {
+            console.log(error.stack);
+            con.end();
+            return;
+      }
+      if (results.length === 0) {
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/login');
+      } else if (results.length === 1) {
+        let salt = bcrypt.genSaltSync(10);
+        let hashedPassword = bcrypt.hashSync(req.body.newPassword, salt);
+        con.query(`UPDATE users SET password='${hashedPassword}', forgot_password='' WHERE forgot_password=${mysql.escape(req.params.resetPasswordID)};`, (error, results, fields) => {
+          if (error) {
+            console.log(error.stack);
+            con.end();
+            return;
+          }
+          con.end();
+          req.flash('success', 'Password successfully changed. You may now login.');
+          return res.redirect('/login');
+        });
+      } else {
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/login');
+      }
+    });
 });
 
 
