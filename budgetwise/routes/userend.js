@@ -105,4 +105,3 @@ router.get('/settings', AuthenticationFunctions.ensureAuthenticated, (req, res) 
 
 
 module.exports = router;
-
