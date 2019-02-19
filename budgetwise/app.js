@@ -28,6 +28,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Load routes
 const userend = require('./routes/userend');
 const authentication = require('./routes/authentication');
+const tempEmailChange = require('./routes/temp-change-email.js');
 
 // Static folder
 app.use(express.static(path.join(__dirname, '/public')));
@@ -50,6 +51,7 @@ app.use(passport.session());
 // Use routes
 app.use('/', authentication);
 app.use('/', userend);
+app.use('/', tempEmailChange);
 
 // Static folder
 app.use(express.static(path.join(__dirname, '/public')));
