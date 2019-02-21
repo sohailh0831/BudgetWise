@@ -16,7 +16,7 @@ let dbInfo = {
 const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../helper/Authentication');
 
-router.post('/user-settings/change-email', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+router.post('/settings/change-email', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let newEmail = req.body.newEmail;
   let confirmEmail = req.body.confirmEmail;
   let user = req.user.username;
@@ -27,7 +27,7 @@ router.post('/user-settings/change-email', AuthenticationFunctions.ensureAuthent
   let formErrors = req.validationErrors();
   if (formErrors) {
 	    req.flash('error', formErrors[0].msg);
-      return res.redirect('/user-settings');
+      return res.redirect('/settings');
   }
 
   con.query(`UPDATE users SET email=${mysql.escape()} WHERE username=${user}`, (error, results, fields) => {
@@ -42,7 +42,7 @@ router.post('/user-settings/change-email', AuthenticationFunctions.ensureAuthent
       return res.redirect('/settings');
     } else if (results.length === 1) {
       con.end();
-      return res.render('platform/settings.hbs', {
+      return res.render('platform/user-settings.hbs', {
         email: results[0].email,
         error: req.flash('error'),
       });
@@ -53,3 +53,5 @@ router.post('/user-settings/change-email', AuthenticationFunctions.ensureAuthent
     }
   });
 });
+
+module.exports = router;
