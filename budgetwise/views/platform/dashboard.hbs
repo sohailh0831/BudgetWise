@@ -1,4 +1,5 @@
 {{> header}}
+<script src="../../../assets/demo/default/custom/crud/metronic-datatable/base/data-json-budgets.js" type="text/javascript"></script>
 				<div class="m-grid__item m-grid__item--fluid m-wrapper">
 
 					<div class="m-content">
@@ -18,40 +19,33 @@
 						{{/if}}
 
 
-
             <div class="row">
-            
-            
-            
-            
-            
-            
-              <div class="col-lg-8">
+            <div class="col-lg-12">
+            <div class="m-portlet m-portlet--mobile">
+							<div class="m-portlet__head">
+								<div class="m-portlet__head-caption">
+									<div class="m-portlet__head-title">
+										<h3 class="m-portlet__head-text">
+											Budgets
+										</h3>
+									</div>
+								</div>
+							</div>
+							<div class="m-portlet__body">
 
+								<!--begin: Datatable -->
+								<div class="m_datatableBudgets" id=""></div>
 
-
-  							<div class="m-portlet m-portlet--tab">
-  									<div class="m-portlet__head">
-  										<div class="m-portlet__head-caption">
-  											<div class="m-portlet__head-title">
-  												<span class="m-portlet__head-icon m--hide">
-  													<i class="la la-gear"></i>
-  												</span>
-  												<h3 class="m-portlet__head-text">
-  													Pie Chart 1
-  												</h3>
-  											</div>
-  										</div>
-  									</div>
-  									<div class="m-portlet__body">
-  										<div id="m_flotcharts_8" style="height: 300px;"></div>
-  									</div>
-  								</div>
-
-
-
-  							</div>
+								<!--end: Datatable -->
+							</div>
+						</div>
             </div>
+            </div>
+
+
+			
+						
+            
 						<div class="row">
 
 
@@ -86,13 +80,17 @@
                       <div class="form-group m-form__group">
 												<label for="exampleSelect1">Recurring Expense</label>
 												<select class="form-control m-input m-input--square" id="exampleSelect1" name="recurringExpense">
-													<option>Yes</option>
-													<option selected="selected">No</option>
+													<option value="yes">Yes</option>
+													<option value="no" selected="selected">No</option>
 												</select>
 											</div>
                       <div class="form-group m-form__group">
 												<label>Recurring Time Frame</label>
 												<input type="text" class="form-control m-input m-input--square" name="recurringTime" placeholder="Recurring every X DAYS">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Recurring Expense End Date (YYYY-MM-DD)</label>
+												<input type="date" class="form-control m-input m-input--square" name="recurringEndDate" placeholder="Recurring Expense End Date (YYYY-MM-DD)">
 											</div>
                       <div class="form-group m-form__group">
 												<label>Expense Name</label>
@@ -135,24 +133,28 @@
 									</div>
 
 									<!--begin::Form-->
-									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-category" method="post">
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-budget" method="post">
 										<div class="m-portlet__body">
-                    <div class="form-group m-form__group">
-												<label for="exampleSelect2">Categories</label>
-												<select multiple="" class="form-control m-input" id="exampleSelect2" disabled="true">
-													{{#each categories}}
-                          <option>{{name}}</option>
-                          {{/each}}
-												</select>
+                      <div class="form-group m-form__group">
+												<label>Budget Name</label>
+												<input type="text" class="form-control m-input m-input--square" name="budgetName" placeholder="Budget Name">
 											</div>
                       <div class="form-group m-form__group">
-												<label>Category Name</label>
-												<input type="text" class="form-control m-input m-input--square" name="categoryName" placeholder="Category Name">
+												<label>Budget Allowance</label>
+												<input type="number" class="form-control m-input m-input--square" name="budgetAllowance" placeholder="Budget Allowance">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Budget Start Date (YYYY-MM-DD)</label>
+												<input type="date" class="form-control m-input m-input--square" name="startDate" placeholder="Start Date (YYYY-MM-DD)">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Budget End Date (YYYY-MM-DD)</label>
+												<input type="date" class="form-control m-input m-input--square" name="endDate" placeholder="End Date (YYYY-MM-DD)">
 											</div>
 										</div>
 										<div class="m-portlet__foot m-portlet__foot--fit">
 											<div class="m-form__actions">
-												<button type="submit" class="btn btn-primary">Create Category</button>
+												<button type="submit" class="btn btn-primary">Create Budget</button>
 											</div>
 										</div>
 									</form>
@@ -186,7 +188,7 @@
 									</div>
 
 									<!--begin::Form-->
-									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-budget" method="post">
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-category" method="post">
 										<div class="m-portlet__body">
                     <div class="form-group m-form__group">
 												<label for="exampleSelect2">Categories</label>
@@ -222,4 +224,6 @@
 					</div>
 				</div>
 			{{> footer}}
+
+
 
