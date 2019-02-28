@@ -28,7 +28,7 @@
 						<div class="sliderWrapper">
 							<div>Currency (USD/CA)&nbsp;&nbsp;</div>
 							<label class="switch">
-								<input type="checkbox">
+								<input type="checkbox" onclick="changeCurrency()">
 								<span class="slider round"></span>
 							</label>
 						</div>
@@ -65,6 +65,36 @@ function toggleClick() {
 }
 function deleteClick() {
 	var result = confirm("Are you sure you want to delete your account?");
+}
+function changeCurrency() {
+	let dbInfo = {
+	  host: "localhost",
+	  user: "root",
+	  password: "BudgetWise1234!",
+	  database : 'budgetwise'
+	};
+	let con = mysql.createConnection(dbInfo);
+	var al;
+	var aS;
+	con.query(`SELECT allowance, amountSpent INTO @al, @aS FROM budgets WHERE user= `, (error, results, fields) => {
+
+	}
+	var newal = fixer(al);
+	var newaS = fixer(aS);
+	con.query(`UPDATE budgets SET allowance=@newal, amountSpent=@newaS WHERE user= `, (error, results, fields) => {
+
+	}
+	var pr;
+	con.query(`SELECT price INTO @pr FROM expenses WHERE user= `, (error, results, fields) => {
+
+	}
+	var newpr = fixer(pr);
+	con.query(`UPDATE expenses SET price=@newpr WHERE user= `, (error, results, fields) => {
+
+	}
+}
+function fixer(num) {
+	loadJSON('http://data.fixer.io/api/latest?access_key=f434557b146d418db96f8949f9878a85');
 }
 </script>
 <style>
