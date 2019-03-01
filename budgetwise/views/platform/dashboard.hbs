@@ -1,5 +1,4 @@
 {{> header}}
-<script src="../../../assets/demo/default/custom/crud/metronic-datatable/base/data-json-budgets.js" type="text/javascript"></script>
 				<div class="m-grid__item m-grid__item--fluid m-wrapper">
 
 					<div class="m-content">
@@ -17,213 +16,132 @@
 							<strong>Success!</strong> {{success}}
 						</div>
 						{{/if}}
+              <div class="row">
+							<div class="col-lg-12">
 
-
-            <div class="row">
-            <div class="col-lg-12">
-            <div class="m-portlet m-portlet--mobile">
-							<div class="m-portlet__head">
-								<div class="m-portlet__head-caption">
-									<div class="m-portlet__head-title">
-										<h3 class="m-portlet__head-text">
-											Budgets
-										</h3>
+								<!--begin::Portlet-->
+								<div class="m-portlet m-portlet--tab">
+									<div class="m-portlet__head">
+										<div class="m-portlet__head-caption">
+											<div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+												<h3 class="m-portlet__head-text">
+													Spending by Category
+                          
+                          <div id="fb-root"></div>
+                                <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2"></script>
+                                <div class="fb-share-button" data-href="http://167.99.156.25/dashboard" data-layout="button" data-size="small" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2F167.99.156.25%2Fdashboard&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
+												</h3>
+											</div>
+										</div>
+									</div>
+									<div class="m-portlet__body">
+										<div id="m_morris_2" style="height:500px;"></div>
 									</div>
 								</div>
-							</div>
-							<div class="m-portlet__body">
 
-								<!--begin: Datatable -->
-								<div class="m_datatableBudgets" id=""></div>
-
-								<!--end: Datatable -->
+								<!--end::Portlet-->
 							</div>
 						</div>
+              <div class="row">
+								<div class="col-lg-4">
+                  <div class="m-portlet m-portlet--tab">
+                      <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                          <div class="m-portlet__head-title">
+                            <span class="m-portlet__head-icon m--hide">
+                              <i class="la la-gear"></i>
+                            </span>
+                            <h3 class="m-portlet__head-text">
+                              Expense Graph
+                            </h3>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="m-portlet__body">
+                        <div id="m_flotcharts_8" style="height: 300px;"></div>
+                      </div>
+                    </div>
+                  </div>
+									<div class="col-lg-4">
+			  							<div class="m-portlet m-portlet--tab">
+			  									<div class="m-portlet__head">
+			  										<div class="m-portlet__head-caption">
+			  											<div class="m-portlet__head-title">
+			  												<span class="m-portlet__head-icon m--hide">
+			  													<i class="la la-gear"></i>
+			  												</span>
+			  												<h3 class="m-portlet__head-text">
+			  													BudgetWise Profile
+			  												</h3>
+			  											</div>
+			  										</div>
+			  									</div>
+			  									<div class="m-portlet__body">
+			  										<div id=""></div>
+			  									</div>
+			  								</div>
+
+
+
+			  							</div>
+
+								<div class="col-xl-4">
+
+	                <div class="m-portlet">
+	                  <div class="m-portlet__head">
+	                    <div class="m-portlet__head-caption">
+	                      <div class="m-portlet__head-title">
+	                        <span class="m-portlet__head-icon m--hide">
+	                          <i class="la la-gear"></i>
+	                        </span>
+	                        <h3 class="m-portlet__head-text">
+	                          Information for '{{budget.name}}' Budget
+	                        </h3>
+	                      </div>
+	                    </div>
+	                  </div>
+
+	                  <!--begin::Form-->
+	                  <form class="m-form" method="post">
+	                    <div class="m-portlet__body">
+	                      <div class="m-form__section m-form__section--first">
+	                        <div class="form-group m-form__group">
+	                          <label for="example_input_full_name">Budget Name</label>
+	                          <input type="text" class="form-control m-input" disabled="" value="{{budget.name}}">
+	                        </div>
+	                        <div class="form-group m-form__group">
+	                          <label for="example_input_full_name">Budget Allowance</label>
+	                          <input type="number" class="form-control m-input" disabled="" id="allowance" value="{{budget.allowance}}">
+	                        </div>
+	                        <div class="form-group m-form__group">
+	                          <label for="example_input_full_name">Budget Spenditure</label>
+	                          <input type="number" class="form-control m-input" disabled="" id="spenditure" value="{{budget.amountSpent}}">
+	                        </div>
+	                        <div class="form-group m-form__group">
+	                          <label for="example_input_full_name">Budget Start Date</label>
+	                          <input type="date" class="form-control m-input" disabled="" value="{{budget.startDate}}">
+	                        </div>
+	                        <div class="form-group m-form__group">
+	                          <label for="example_input_full_name">Budget End Date</label>
+	                          <input type="date" class="form-control m-input" disabled="" value="{{budget.endDate}}">
+	                        </div>
+	                      </div>
+	                    </div>
+	                    <div class="m-portlet__foot m-portlet__foot--fit">
+	                      <div class="m-form__actions m-form__actions">
+	                        <a href="/dashboard" class="btn btn-secondary">Return to Dashboard</a>
+	                      </div>
+	                    </div>
+	                  </form>
+
+	                  <!--end::Form-->
+	                </div>
+	              </div>
             </div>
-            </div>
-
-
-			
-						
-            
-						<div class="row">
-
-
-
-              <div class="col-lg-4">
-
-                <div class="m-portlet m-portlet--tab">
-									<div class="m-portlet__head">
-										<div class="m-portlet__head-caption">
-											<div class="m-portlet__head-title">
-												<span class="m-portlet__head-icon m--hide">
-													<i class="la la-gear"></i>
-												</span>
-												<h3 class="m-portlet__head-text">
-													Enter a New Expense
-												</h3>
-											</div>
-										</div>
-									</div>
-
-									<!--begin::Form-->
-									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-expense" method="post">
-										<div class="m-portlet__body">
-											<div class="form-group m-form__group">
-												<label for="exampleSelect1">Category</label>
-												<select class="form-control m-input m-input--square" id="exampleSelect1" name="category">
-                          {{#each categories}}
-                          <option value={{id}}>{{name}}</option>
-                          {{/each}}
-												</select>
-											</div>
-                      <div class="form-group m-form__group">
-												<label for="exampleSelect1">Recurring Expense</label>
-												<select class="form-control m-input m-input--square" id="exampleSelect1" name="recurringExpense">
-													<option value="yes">Yes</option>
-													<option value="no" selected="selected">No</option>
-												</select>
-											</div>
-                      <div class="form-group m-form__group">
-												<label>Recurring Time Frame</label>
-												<input type="text" class="form-control m-input m-input--square" name="recurringTime" placeholder="Recurring every X DAYS">
-											</div>
-                      <div class="form-group m-form__group">
-												<label>Recurring Expense End Date (YYYY-MM-DD)</label>
-												<input type="date" class="form-control m-input m-input--square" name="recurringEndDate" placeholder="Recurring Expense End Date (YYYY-MM-DD)">
-											</div>
-                      <div class="form-group m-form__group">
-												<label>Expense Name</label>
-												<input type="text" class="form-control m-input m-input--square" name="expenseName" placeholder="Expense Name">
-											</div>
-                      <div class="form-group m-form__group">
-												<label>Expense Price</label>
-												<input type="text" class="form-control m-input m-input--square" name="expensePrice" placeholder="Expense Price">
-											</div>
-										</div>
-										<div class="m-portlet__foot m-portlet__foot--fit">
-											<div class="m-form__actions">
-												<button type="submit" class="btn btn-primary">Add Expense</button>
-											</div>
-										</div>
-									</form>
-
-									<!--end::Form-->
-								</div>
-
-
-							</div>
-
-
-
-							<div class="col-lg-4">
-
-                <div class="m-portlet m-portlet--tab">
-									<div class="m-portlet__head">
-										<div class="m-portlet__head-caption">
-											<div class="m-portlet__head-title">
-												<span class="m-portlet__head-icon m--hide">
-													<i class="la la-gear"></i>
-												</span>
-												<h3 class="m-portlet__head-text">
-													Create a Budget
-												</h3>
-											</div>
-										</div>
-									</div>
-
-									<!--begin::Form-->
-									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-budget" method="post">
-										<div class="m-portlet__body">
-                      <div class="form-group m-form__group">
-												<label>Budget Name</label>
-												<input type="text" class="form-control m-input m-input--square" name="budgetName" placeholder="Budget Name">
-											</div>
-                      <div class="form-group m-form__group">
-												<label>Budget Allowance</label>
-												<input type="number" class="form-control m-input m-input--square" name="budgetAllowance" placeholder="Budget Allowance">
-											</div>
-                      <div class="form-group m-form__group">
-												<label>Budget Start Date (YYYY-MM-DD)</label>
-												<input type="date" class="form-control m-input m-input--square" name="startDate" placeholder="Start Date (YYYY-MM-DD)">
-											</div>
-                      <div class="form-group m-form__group">
-												<label>Budget End Date (YYYY-MM-DD)</label>
-												<input type="date" class="form-control m-input m-input--square" name="endDate" placeholder="End Date (YYYY-MM-DD)">
-											</div>
-										</div>
-										<div class="m-portlet__foot m-portlet__foot--fit">
-											<div class="m-form__actions">
-												<button type="submit" class="btn btn-primary">Create Budget</button>
-											</div>
-										</div>
-									</form>
-
-									<!--end::Form-->
-								</div>
-
-
-							</div>
-
-
-
-
-
-							
-
-              <div class="col-lg-4">
-
-                <div class="m-portlet m-portlet--tab">
-									<div class="m-portlet__head">
-										<div class="m-portlet__head-caption">
-											<div class="m-portlet__head-title">
-												<span class="m-portlet__head-icon m--hide">
-													<i class="la la-gear"></i>
-												</span>
-												<h3 class="m-portlet__head-text">
-													Create a Category
-												</h3>
-											</div>
-										</div>
-									</div>
-
-									<!--begin::Form-->
-									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-category" method="post">
-										<div class="m-portlet__body">
-                    <div class="form-group m-form__group">
-												<label for="exampleSelect2">Categories</label>
-												<select multiple="" class="form-control m-input" id="exampleSelect2" disabled="true">
-													{{#each categories}}
-                          <option>{{name}}</option>
-                          {{/each}}
-												</select>
-											</div>
-                      <div class="form-group m-form__group">
-												<label>Category Name</label>
-												<input type="text" class="form-control m-input m-input--square" name="categoryName" placeholder="Category Name">
-											</div>
-										</div>
-										<div class="m-portlet__foot m-portlet__foot--fit">
-											<div class="m-form__actions">
-												<button type="submit" class="btn btn-primary">Create Category</button>
-											</div>
-										</div>
-									</form>
-
-									<!--end::Form-->
-								</div>
-
-
-							</div>
-
-
-						</div>
-
-
 						<!--End::Main Portlet-->
 					</div>
 				</div>
 			{{> footer}}
-
-
-
