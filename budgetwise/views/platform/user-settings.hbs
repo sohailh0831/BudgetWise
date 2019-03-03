@@ -103,6 +103,16 @@ access_key = 'f434557b146d418db96f8949f9878a85';
 base = 'USD';
 symbols = 'CAD';
 
+con.query(`SELECT currency FROM Settings WHERE user= `, (error, results, fields) => {
+	base = results[0].currency;
+}
+if(base === 'USD') {
+	symbols = 'CAD';
+}
+else {
+	symbols = 'CAD';
+}
+
 // get the most recent exchange rates via the "latest" endpoint:
 $.ajax({
     url: 'http://data.fixer.io/api/' + endpoint + '?access_key=' + access_key + '&base=' + base + '&symbols=' + symbols,
@@ -117,6 +127,10 @@ $.ajax({
 
         // timestamp can be accessed in json.timestamp
         alert(json.timestamp);
+
+				con.query(`UPDATE Settings SET currency=@symbols WHERE user= `, (error, results, fields) => {
+
+				}
 
 				return num * json.rates.CAD;
     }
