@@ -1,15 +1,16 @@
 var MorrisChartsDemo = {
     init: function() {
-        var graph = {
+        
+        var graph1 = {
           element: "m_morris_2",
             data: [{
                 y: "2006",
-                a: 100,
-                b: 90
+                'b': 90,
+                'a': 100
             }, {
                 y: "2007",
-                a: 75,
-                b: 65
+                'a': 75,
+                'b': 65
             }, {
                 y: "2008",
                 a: 50,
@@ -31,11 +32,25 @@ var MorrisChartsDemo = {
                 a: 100,
                 b: 90
             }],
-            xkey: "y",
-            ykeys: ["a", "b"],
-            labels: ["Series A", "Series B"]
+            xkey: 'y',
+            ykeys: ['a', 'b'],
+            labels: ['Series A', 'Series B']
         }
-        new Morris.Area(graph)
+        var graph2;
+      fetch('http://167.99.156.25/budgetss/get-user-spend-per-category').then(response => {
+        return response.json();
+      }).then(data23 => {
+        // Work with JSON data here
+        console.log(data23);
+        new Morris.Area(data23)
+      }).catch(err => {
+        // Do something for an error here
+      });
+
+      
+      
+      
+      
     }
 };
 jQuery(document).ready(function() {

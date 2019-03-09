@@ -79,9 +79,59 @@ function addExpenseToBudgets(expensePrice, userID, recurringExpense, recurringTi
   })
 }
 
+function getCategoriesByUser(userID) {
+  return new Promise(function(resolve, reject) {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM categories WHERE owner=${mysql.escape(userID)} ORDER BY name;`, (error, categories, fields) => {
+        if (error) {
+            console.log(error.stack);
+            con.end();
+            return reject(error);
+        }
+        con.end();
+        return resolve(categories);
+    });
+  })
+}
+
+function getExpensesFromUserAndDate(userID, date, data, categories) {
+  return new Promise(function(resolve, reject) {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM expenses WHERE user=${mysql.escape(userID)} AND creationDate >= ${date} ORDER BY creationDate;`, (error, expenses, fields) => {
+      if (error) {
+        console.log(error.stack);
+        con.end();
+        return reject(error);
+      }
+      for (let i = 0; i < expenses.length; i++) {
+        for (let j = 0; j < data.length; j++) {
+          let d1 = new Date(expenses[i].creationDate);
+          d1.setHours(0,0,0,0);
+          let d2 = new Date(data[j].y);
+          if (d1.getTime() == d2.getTime()) {
+            data[j][expenses[i].category] = data[j][expenses[i].category] + expenses[i].price;
+            break;
+          }
+        }
+      }
+      resolve(data);
+    });
+  })
+}
+
+async function buildGraph(data, categories, userID, date) {
+    let res = await getExpensesFromUserAndDate(userID, date, data, categories);
+    return res;
+}
+
+
+
 
 module.exports = {
   addExpenseToBudgets,
+  getCategoriesByUser,
+  buildGraph,
+  
 
 
 }

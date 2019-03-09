@@ -204,23 +204,69 @@ router.post('/budgets/get-user-budgets', AuthenticationFunctions.ensureAuthentic
   });
 });
 
-router.get('/budgets/get-user-spend-per-category', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  let con = mysql.createConnection(dbInfo);
-  con.query(`SELECT * FROM budgets WHERE id=${mysql.escape(req.params.id)} AND user=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
-    if (error) {
-        console.log(error.stack);
-        con.end();
-        return res.send();
+
+router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+     function formatDate(date){
+
+        var dd = date.getDate();
+        var mm = date.getMonth()+1;
+        var yyyy = date.getFullYear();
+        if(dd<10) {dd='0'+dd}
+        if(mm<10) {mm='0'+mm}
+        date = yyyy+'-'+mm+'-'+dd;
+        return date
+     }
+    let dates = [];
+    for (let i=6; i>=0; i--) {
+        let d = new Date();
+        d.setDate(d.getDate() - i);
+        dates.push(formatDate(d));
     }
-    if (results.length === 1) {
-      con.end();
-      return res.send(results[0]);
-    } else {
-      con.end();
-      return res.send();
-    }
+    let graph = {
+          element: "m_morris_2",
+          xkey: "y",
+          data: [],
+          ykeys: [],
+          labels: []
+     };
+     let data = [];
+  
+  BudgetFunctions.getCategoriesByUser(req.user.identifier)
+  .then(categories => {
+        for (let i = 0; i < dates.length; i++) {
+              let obj = {
+                y: dates[i]
+              }
+              data.push(obj);
+              for (let j = 0; j < categories.length; j++) {
+                data[i][categories[j].id] = 0;
+              }
+        }
+        let ykeys = [];
+        let labels = [];
+        for (let i = 0; i < categories.length; i++) {
+          ykeys.push(`${categories[i].id}`);
+          labels.push(categories[i].name);
+        }
+        graph.ykeys = ykeys;
+        graph.labels = labels;
+        graph.data = data;
+        let computationData = BudgetFunctions.buildGraph(data, categories, req.user.identifier, dates[0]);
+        computationData.then(resultData => {
+          graph.data = resultData;
+          console.log(graph);
+          return res.send(graph);
+        })
+  }).catch(error => {
+    console.log(error);
+    return res.send();
   });
+ 
 });
+
+router.get('/testroute123', (req, res) => {
+  res.send([{h: 'lol'}]);
+})
 
 router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
