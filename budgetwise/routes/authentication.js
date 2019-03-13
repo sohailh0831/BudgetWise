@@ -114,6 +114,8 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
             let foodID = uuidv4();
             let entertainmentName = "Entertainment";
             let entertainmentID = uuidv4();
+            let retirementName = "Retirement"
+            let retirementID = uuidv4();
             con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(billsID)}, ${mysql.escape(billsName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
               if (error) {
                   console.log(error.stack);
@@ -138,9 +140,16 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
                         con.end();
                         return res.send();
                     }
-                    con.end();
-                    req.flash('success', 'Successfully registered. You may now login.');
-                    return res.redirect('/login');
+                    con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(retirementID)}, ${mysql.escape(retirementName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
+                      if (error) {
+                          console.log(error.stack);
+                          con.end();
+                          return res.send();
+                      }
+                      con.end();
+                      req.flash('success', 'Successfully registered. You may now login.');
+                      return res.redirect('/login');
+                    });
                   });
                 });
               });
