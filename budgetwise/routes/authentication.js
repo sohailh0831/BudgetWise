@@ -114,8 +114,6 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
             let foodID = uuidv4();
             let entertainmentName = "Entertainment";
             let entertainmentID = uuidv4();
-            let retirementName = "Retirement"
-            let retirementID = uuidv4();
             con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(billsID)}, ${mysql.escape(billsName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
               if (error) {
                   console.log(error.stack);
@@ -140,16 +138,9 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
                         con.end();
                         return res.send();
                     }
-                    con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(retirementID)}, ${mysql.escape(retirementName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
-                      if (error) {
-                          console.log(error.stack);
-                          con.end();
-                          return res.send();
-                      }
-                      con.end();
-                      req.flash('success', 'Successfully registered. You may now login.');
-                      return res.redirect('/login');
-                    });
+                    con.end();
+                    req.flash('success', 'Successfully registered. You may now login.');
+                    return res.redirect('/login');
                   });
                 });
               });
@@ -221,6 +212,74 @@ router.post('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, 
     }
   });
 });
+
+//Parental Route
+router.get('/parental', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  return res.render('platform/parental.hbs', {
+    error: req.flash('error'),
+    success: req.flash('success')
+  });
+});
+
+router.post('/parental', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let username = req.body.username;
+  let password = req.body.password;
+  let confirmPassword = req.body.password2;
+  console.log(req.body);
+    if (req.body.password.includes(' ') || req.body.password2.includes(' ')) {
+      req.flash('error', 'Password cannot contain spaces.');
+      return res.redirect('/parental');
+    }
+    if (req.body.password.length < 4 || req.body.password2.length < 4) {
+      req.flash('error', 'Password must be longer than 3 characters.');
+      return res.redirect('/parental');
+    }
+    req.checkBody('username', 'Username field is required.').notEmpty();
+    req.checkBody('password', 'New Password field is required.').notEmpty();
+    req.checkBody('password2', 'Confirm New password field is required.').notEmpty();
+	  req.checkBody('password2', 'New password does not match confirmation password field.').equals(req.body.password);
+    let formErrors = req.validationErrors();
+    if (formErrors) {
+		    req.flash('error', formErrors[0].msg);
+        return res.redirect('/parental');
+	  }
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM users WHERE username=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+      if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+      }
+      if (results.length === 0) {
+        let salt = bcrypt.genSaltSync(10);
+        let hashedPassword = bcrypt.hashSync(req.body.password, salt);
+        let userID = uuidv4();
+        con.query(`UPDATE users SET parental_username=${mysql.escape(req.body.username)} , parental_password='${hashedPassword}' WHERE userID=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+          if (error) {
+            console.log(error.stack);
+            con.end();
+            return;
+          }
+          if (results) {
+            console.log(`${req.body.email} successfully registered.`);
+                    req.flash('success', 'Successfully Added Parental Account.');
+                    return res.redirect('/dashboard');
+          } else {
+            con.end();
+            req.flash('error', 'Error Adding Parental Account. Please try again.');
+            return res.redirect('/parental');
+          }
+        });
+      } else {
+        req.flash('error', "This username or email has already been registered.");
+        con.end();
+        return res.redirect('/parental');
+      }
+    });
+});
+
+
+
 
 router.get('/reset-password/:resetPasswordID', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
