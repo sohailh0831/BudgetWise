@@ -37,7 +37,7 @@ router.get('/dashboard', AuthenticationFunctions.ensureAuthenticated, (req, res)
       error: req.flash('error'),
       success: req.flash('success'),
     });
-     
+
   });
 });
 
@@ -156,7 +156,7 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
                 }
               });
             });
-            
+
           }
         }).catch(error => {
           console.log(error);
@@ -169,6 +169,7 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
 router.get('/categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   return res.render('platform/categories.hbs');
 });
+
 
 router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
@@ -230,7 +231,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
           labels: []
      };
      let data = [];
-  
+
   BudgetFunctions.getCategoriesByUser(req.user.identifier)
   .then(categories => {
         for (let i = 0; i < dates.length; i++) {
@@ -254,19 +255,14 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
         let computationData = BudgetFunctions.buildGraph(data, categories, req.user.identifier, dates[0]);
         computationData.then(resultData => {
           graph.data = resultData;
-          console.log(graph);
           return res.send(graph);
         })
   }).catch(error => {
     console.log(error);
     return res.send();
   });
- 
-});
 
-router.get('/testroute123', (req, res) => {
-  res.send([{h: 'lol'}]);
-})
+});
 
 router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
@@ -282,7 +278,28 @@ router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAut
 });
 
 router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  return res.render('platform/view-category.hbs');
+  let con = mysql.createConnection(dbInfo);
+
+  var cat = "";
+  con.query(`SELECT * FROM categories WHERE id=${mysql.escape(req.params.id)} AND owner=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+    }
+    else if (results.length != 1) {
+      con.end();
+    } else {
+      cat = results[0].name;
+      //The app is executing the above line, but after it executes, cat is still just an empty string
+    }
+  });
+
+  console.log(cat);
+  if(cat == "Retirement") {
+    return res.render('platform/retirement.hbs');
+  } else {
+    return res.render('platform/view-category.hbs');
+  }
 });
 
 router.post('/category-expenses/:id', (req, res) => {
