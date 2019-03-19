@@ -280,26 +280,27 @@ router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAut
 router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
 
-  var cat = "";
-  con.query(`SELECT * FROM categories WHERE id=${mysql.escape(req.params.id)} AND owner=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
-    if (error) {
-        console.log(error.stack);
-        con.end();
-    }
-    else if (results.length != 1) {
-      con.end();
-    } else {
-      cat = results[0].name;
-      //The app is executing the above line, but after it executes, cat is still just an empty string
-    }
-  });
+//   var cat = "";
+//   con.query(`SELECT * FROM categories WHERE id=${mysql.escape(req.params.id)} AND owner=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+//     if (error) {
+//         console.log(error.stack);
+//         con.end();
+//     }
+//     else if (results.length != 1) {
+//       con.end();
+//     } else {
+//       cat = results[0].name;
+//       //The app is executing the above line, but after it executes, cat is still just an empty string
+//     }
+//   });
 
-  console.log(cat);
-  if(cat == "Retirement") {
-    return res.render('platform/retirement.hbs');
-  } else {
-    return res.render('platform/view-category.hbs');
-  }
+//   console.log(cat);
+//   if(cat == "Retirement") {
+//     return res.render('platform/retirement.hbs');
+//   } else {
+//     return res.render('platform/view-category.hbs');
+//   }
+  return res.render('platform/view-category.hbs');
 });
 
 router.post('/category-expenses/:id', (req, res) => {
@@ -320,7 +321,94 @@ router.post('/category-expenses/:id', (req, res) => {
   });
 });
 
+router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  let retirementGoal = 0;
 
+  con.query(`SELECT * FROM categories WHERE owner=${mysql.escape(req.user.identifier)};`, (error, categories, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+    }
+    for (let i = 0; i < categories.length; i++) {
+      if (categories[i].name === 'Retirement') {
+        con.query(`SELECT * FROM expenses WHERE user=${mysql.escape(req.user.identifier)} AND category='${categories[i].id}';`, (error, expenses, fields) => {
+          let sum = 0;
+          if (error) {
+              console.log(error.stack);
+              con.end();
+              return res.send();
+          }
+          for (let j = 0; j < expenses.length; j++) {
+            sum += expenses[j].price;
+          }
+
+          let lastYear = new Date();
+          lastYear.setDate(lastYear.getDate()-365);
+          let year = [];
+          for (let i = 0; i < expenses.length; i++) {
+            if(expenses[i].creationDate > lastYear) {
+               year.push(expenses[i]);
+            }
+          }
+          let ySum = 0;
+          for (let j = 0; j < year.length; j++) {
+            ySum += year[j].price;
+          }
+
+          let lastMonth = new Date();
+          lastMonth.setDate(lastMonth.getDate()-30);
+          let month = [];
+          for (let i = 0; i < expenses.length; i++) {
+            if(expenses[i].creationDate > lastMonth) {
+               month.push(expenses[i]);
+            }
+          }
+          let mSum = 0;
+          for (let j = 0; j < month.length; j++) {
+            mSum += month[j].price;
+          }
+
+          con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+            if (error) {
+              console.log(error.stack);
+              con.end();
+              return res.send();
+            }
+            if (results.length != 1) {
+              con.end();
+              return res.send();
+            } else {
+              retirementGoal = results[0].retirementGoal;
+
+              let goal = retirementGoal - sum;
+              if(goal < 0) {
+                goal = 0;
+              }
+
+              let goalPercent = sum / retirementGoal;
+              if (goalPercent > 1) {
+                goalPercent = 1;
+              }
+              goalPercent *= 100;
+
+              con.end();
+
+              return res.render('platform/retirement.hbs', {
+                retirementSum: sum,
+                monthSum: mSum,
+                yearSum: ySum,
+                amountToGoal: goal,
+                percentToGoal: goalPercent
+              });
+            }
+          });
+        });
+      }
+    }
+  });
+});
 
 router.get('/settings', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   return res.render('platform/user-settings.hbs');
