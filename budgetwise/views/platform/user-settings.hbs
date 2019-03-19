@@ -74,7 +74,8 @@ function changeCurrency() {
 	  database : 'budgetwise'
 	};
 	let con = mysql.createConnection(dbInfo);
-	con.query(`SELECT allowance, amountSpent, id FROM budgets WHERE user= `, (error, results, fields) => {
+	let uID = req.user.identifier;
+	con.query(`SELECT allowance, amountSpent, id FROM budgets WHERE user=@uID`, (error, results, fields) => {
 		var i;
 		for (i = 0; i < results.length; i++) {
 			var newal = fixer(results[i].allowance);
@@ -85,12 +86,12 @@ function changeCurrency() {
 			}
 		}
 	}
-	con.query(`SELECT price INTO @pr FROM expenses WHERE user= `, (error, results, fields) => {
+	con.query(`SELECT price INTO @pr FROM expenses WHERE user=@uID`, (error, results, fields) => {
 		var i;
 		for (i = 0; i < results.length; i++) {
 			var newpr = fixer(results[i].price);
 			var id = results[i].id;
-			con.query(`UPDATE expenses SET price=@newpr WHERE user= `, (error, results, fields) => {
+			con.query(`UPDATE expenses SET price=@newpr WHERE id=@id`, (error, results, fields) => {
 
 			}
 		}
@@ -103,14 +104,14 @@ access_key = 'f434557b146d418db96f8949f9878a85';
 base = 'USD';
 symbols = 'CAD';
 
-con.query(`SELECT currency FROM Settings WHERE user= `, (error, results, fields) => {
+con.query(`SELECT currency FROM Settings WHERE user=@uID`, (error, results, fields) => {
 	base = results[0].currency;
 }
 if(base === 'USD') {
 	symbols = 'CAD';
 }
 else {
-	symbols = 'CAD';
+	symbols = 'USD';
 }
 
 // get the most recent exchange rates via the "latest" endpoint:
@@ -128,7 +129,7 @@ $.ajax({
         // timestamp can be accessed in json.timestamp
         alert(json.timestamp);
 
-				con.query(`UPDATE Settings SET currency=@symbols WHERE user= `, (error, results, fields) => {
+				con.query(`UPDATE Settings SET currency=@symbols WHERE user=@uID`, (error, results, fields) => {
 
 				}
 
