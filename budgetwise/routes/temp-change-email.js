@@ -19,7 +19,7 @@ const AuthenticationFunctions = require('../helper/Authentication');
 router.post('/settings/change-email', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let newEmail = req.body.newEmail;
   let confirmEmail = req.body.confirmEmail;
-  let user = req.user.username;
+  let userid = req.user.identifier;
 
   req.checkBody('newEmail', 'New email field is required.').notEmpty();
   req.checkBody('confirmEmail', 'New email does not match email confirmation field.').equals(newEmail);
@@ -29,8 +29,8 @@ router.post('/settings/change-email', AuthenticationFunctions.ensureAuthenticate
 	    req.flash('error', formErrors[0].msg);
       return res.redirect('/settings');
   }
-
-  con.query(`UPDATE users SET email=${mysql.escape()} WHERE username=${user}`, (error, results, fields) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`UPDATE users SET email=${mysql.escape()} WHERE id=${userid}`, (error, results, fields) => {
     if (error) {
           console.log(error.stack);
           con.end();
