@@ -57,6 +57,10 @@
 													<input type="text" class="form-control m-input" value="{{user.last_name}}" disabled="">
 												</div>
                         <div class="form-group m-form__group">
+													<label>Currency:</label>
+													<input type="text" class="form-control m-input" value="{{user.currency}}" disabled="">
+												</div>
+                        <div class="form-group m-form__group">
 													<label>Parental Username:</label>
 													<input type="text" class="form-control m-input" value="{{user.parental_username}}" disabled="">
 													<span class="m-form__help">If blank, no parental account exists for your BudgetWise profile</span>
@@ -95,11 +99,11 @@
 											<div class="m-form__section m-form__section--first">
 												<div class="form-group m-form__group">
 													<label for="example_input_full_name">Email:</label>
-													<input type="email" class="form-control m-input" name="email" value="{{user.email}}">
+													<input required="true" type="email" class="form-control m-input" name="email" value="{{user.email}}">
 												</div>
                         <div class="form-group m-form__group">
 													<label>Current Password</label>
-													<input type="password" name="currentPassword" class="form-control m-input">
+													<input type="password" required="true" name="currentPassword" class="form-control m-input">
 												</div>
                         <div class="form-group m-form__group">
 													<label>New Password</label>
@@ -108,6 +112,11 @@
                         <div class="form-group m-form__group">
 													<label>Confirm New Password</label>
 													<input type="password" name="newPassword2" class="form-control m-input">
+												</div>
+                        <div class="form-group m-form__group">
+													<label>Currency</label>
+													<input type="text" name="currencyChoice" class="form-control m-input" required="true" value="{{user.currency}}">
+                          <span class="m-form__help">Options: EUR, USD, AUD, CAD, or INR</span>
 												</div>
 											</div>
 										</div>
@@ -237,91 +246,3 @@
 					</div>
 				</div>
 			{{> footer}}
-<script>
-function toggleClick() {
-	if(document.getElementById("Div1").style.backgroundColor==="rgb(0, 115, 230)") {
-		document.getElementById("Div1").style.backgroundColor="#ffffff";
-	}
-	else {
-  	document.getElementById("Div1").style.backgroundColor="#0073e6";
-	}
-}
-function deleteClick() {
-	var result = confirm("Are you sure you want to delete your account?");
-}
-function changeCurrency() {
-	let dbInfo = {
-	  host: "localhost",
-	  user: "root",
-	  password: "BudgetWise1234!",
-	  database : 'budgetwise'
-	};
-	let con = mysql.createConnection(dbInfo);
-	let uID = req.user.identifier;
-	con.query(`SELECT allowance, amountSpent, id FROM budgets WHERE user=@uID`, (error, results, fields) => {
-		var i;
-		for (i = 0; i < results.length; i++) {
-			var newal = fixer(results[i].allowance);
-			var newaS = fixer(results[i].amountSpent);
-			var id = results[i].id;
-			con.query(`UPDATE budgets SET allowance=@newal, amountSpent=@newaS WHERE id=@id `, (error, results, fields) => {
-
-			}
-		}
-	}
-	con.query(`SELECT price INTO @pr FROM expenses WHERE user=@uID`, (error, results, fields) => {
-		var i;
-		for (i = 0; i < results.length; i++) {
-			var newpr = fixer(results[i].price);
-			var id = results[i].id;
-			con.query(`UPDATE expenses SET price=@newpr WHERE id=@id`, (error, results, fields) => {
-
-			}
-		}
-	}
-}
-function fixer(num) {
-	// set endpoint and your access key
-endpoint = 'latest'
-access_key = 'f434557b146d418db96f8949f9878a85';
-base = 'USD';
-symbols = 'CAD';
-
-con.query(`SELECT currency FROM Settings WHERE user=@uID`, (error, results, fields) => {
-	base = results[0].currency;
-}
-if(base === 'USD') {
-	symbols = 'CAD';
-}
-else {
-	symbols = 'USD';
-}
-
-// get the most recent exchange rates via the "latest" endpoint:
-$.ajax({
-    url: 'http://data.fixer.io/api/' + endpoint + '?access_key=' + access_key + '&base=' + base + '&symbols=' + symbols,
-    dataType: 'jsonp',
-    success: function(json) {
-
-        // exchange rata data is stored in json.rates
-        alert(json.rates.CAD);
-
-        // base currency is stored in json.base
-        alert(json.base);
-
-        // timestamp can be accessed in json.timestamp
-        alert(json.timestamp);
-
-				con.query(`UPDATE Settings SET currency=@symbols WHERE user=@uID`, (error, results, fields) => {
-
-				}
-
-				return num * json.rates.CAD;
-    }
-		error: function(){
-			alert('error');
-    	return num;
-  }
-});
-}
-</script>

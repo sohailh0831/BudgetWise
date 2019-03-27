@@ -65,7 +65,6 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
   let email = req.body.email;
   let password = req.body.password;
   let confirmPassword = req.body.password2;
-  console.log(req.body);
     if (req.body.password.includes(' ') || req.body.password2.includes(' ')) {
       req.flash('error', 'Password cannot contain spaces.');
       return res.redirect('/register');
@@ -87,7 +86,7 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
         return res.redirect('/register');
 	  }
     let con = mysql.createConnection(dbInfo);
-    con.query(`SELECT * FROM users WHERE username=${mysql.escape(req.body.username)} OR email=${mysql.escape(req.body.email)};`, (error, results, fields) => {
+    con.query(`SELECT * FROM users WHERE username=${mysql.escape(req.body.username)} OR email=${mysql.escape(req.body.email)} OR parental_username=${mysql.escape(req.body.email)};`, (error, results, fields) => {
       if (error) {
         console.log(error.stack);
         con.end();
@@ -114,6 +113,8 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
             let foodID = uuidv4();
             let entertainmentName = "Entertainment";
             let entertainmentID = uuidv4();
+            let retirementName = "Retirement";
+            let retirementID = uuidv4();
             con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(billsID)}, ${mysql.escape(billsName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
               if (error) {
                   console.log(error.stack);
@@ -138,9 +139,16 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
                         con.end();
                         return res.send();
                     }
-                    con.end();
-                    req.flash('success', 'Successfully registered. You may now login.');
-                    return res.redirect('/login');
+                    con.query(`INSERT INTO categories (id, name, owner) VALUES (${mysql.escape(retirementID)}, ${mysql.escape(retirementName)}, ${mysql.escape(userID)})`, (error, results, fields) => {
+                      if (error) {
+                          console.log(error.stack);
+                          con.end();
+                          return res.send();
+                      }
+                      con.end();
+                      req.flash('success', 'Successfully registered. You may now login.');
+                      return res.redirect('/login');
+                    });
                   });
                 });
               });
@@ -152,7 +160,7 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
           }
         });
       } else {
-        req.flash('error', "This username or email has already been registered.");
+        req.flash('error', "This username or email has already been registered or exists as a parental account.");
         con.end();
         return res.redirect('/register');
       }
@@ -213,70 +221,70 @@ router.post('/forgot-password', AuthenticationFunctions.ensureNotAuthenticated, 
   });
 });
 
-//Parental Route
-router.get('/parental', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  return res.render('platform/parental.hbs', {
-    error: req.flash('error'),
-    success: req.flash('success')
-  });
-});
+// //Parental Route
+// router.get('/parental', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+//   return res.render('platform/parental.hbs', {
+//     error: req.flash('error'),
+//     success: req.flash('success')
+//   });
+// });
 
-router.post('/parental', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  let username = req.body.username;
-  let password = req.body.password;
-  let confirmPassword = req.body.password2;
-  console.log(req.body);
-    if (req.body.password.includes(' ') || req.body.password2.includes(' ')) {
-      req.flash('error', 'Password cannot contain spaces.');
-      return res.redirect('/parental');
-    }
-    if (req.body.password.length < 4 || req.body.password2.length < 4) {
-      req.flash('error', 'Password must be longer than 3 characters.');
-      return res.redirect('/parental');
-    }
-    req.checkBody('username', 'Username field is required.').notEmpty();
-    req.checkBody('password', 'New Password field is required.').notEmpty();
-    req.checkBody('password2', 'Confirm New password field is required.').notEmpty();
-	  req.checkBody('password2', 'New password does not match confirmation password field.').equals(req.body.password);
-    let formErrors = req.validationErrors();
-    if (formErrors) {
-		    req.flash('error', formErrors[0].msg);
-        return res.redirect('/parental');
-	  }
-    let con = mysql.createConnection(dbInfo);
-    con.query(`SELECT * FROM users WHERE username=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
-      if (error) {
-        console.log(error.stack);
-        con.end();
-        return res.send();
-      }
-      if (results.length === 0) {
-        let salt = bcrypt.genSaltSync(10);
-        let hashedPassword = bcrypt.hashSync(req.body.password, salt);
-        let userID = uuidv4();
-        con.query(`UPDATE users SET parental_username=${mysql.escape(req.body.username)} , parental_password='${hashedPassword}' WHERE userID=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
-          if (error) {
-            console.log(error.stack);
-            con.end();
-            return;
-          }
-          if (results) {
-            console.log(`${req.body.email} successfully registered.`);
-                    req.flash('success', 'Successfully Added Parental Account.');
-                    return res.redirect('/dashboard');
-          } else {
-            con.end();
-            req.flash('error', 'Error Adding Parental Account. Please try again.');
-            return res.redirect('/parental');
-          }
-        });
-      } else {
-        req.flash('error', "This username or email has already been registered.");
-        con.end();
-        return res.redirect('/parental');
-      }
-    });
-});
+// router.post('/parental', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+//   let username = req.body.username;
+//   let password = req.body.password;
+//   let confirmPassword = req.body.password2;
+//   console.log(req.body);
+//     if (req.body.password.includes(' ') || req.body.password2.includes(' ')) {
+//       req.flash('error', 'Password cannot contain spaces.');
+//       return res.redirect('/parental');
+//     }
+//     if (req.body.password.length < 4 || req.body.password2.length < 4) {
+//       req.flash('error', 'Password must be longer than 3 characters.');
+//       return res.redirect('/parental');
+//     }
+//     req.checkBody('username', 'Username field is required.').notEmpty();
+//     req.checkBody('password', 'New Password field is required.').notEmpty();
+//     req.checkBody('password2', 'Confirm New password field is required.').notEmpty();
+// 	  req.checkBody('password2', 'New password does not match confirmation password field.').equals(req.body.password);
+//     let formErrors = req.validationErrors();
+//     if (formErrors) {
+// 		    req.flash('error', formErrors[0].msg);
+//         return res.redirect('/parental');
+// 	  }
+//     let con = mysql.createConnection(dbInfo);
+//     con.query(`SELECT * FROM users WHERE username=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+//       if (error) {
+//         console.log(error.stack);
+//         con.end();
+//         return res.send();
+//       }
+//       if (results.length === 0) {
+//         let salt = bcrypt.genSaltSync(10);
+//         let hashedPassword = bcrypt.hashSync(req.body.password, salt);
+//         let userID = uuidv4();
+//         con.query(`UPDATE users SET parental_username=${mysql.escape(req.body.username)} , parental_password='${hashedPassword}' WHERE userID=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+//           if (error) {
+//             console.log(error.stack);
+//             con.end();
+//             return;
+//           }
+//           if (results) {
+//             console.log(`${req.body.email} successfully registered.`);
+//                     req.flash('success', 'Successfully Added Parental Account.');
+//                     return res.redirect('/dashboard');
+//           } else {
+//             con.end();
+//             req.flash('error', 'Error Adding Parental Account. Please try again.');
+//             return res.redirect('/parental');
+//           }
+//         });
+//       } else {
+//         req.flash('error', "This username or email has already been registered.");
+//         con.end();
+//         return res.redirect('/parental');
+//       }
+//     });
+// });
 
 
 
@@ -363,7 +371,7 @@ router.post('/reset-password/:resetPasswordID', AuthenticationFunctions.ensureNo
 passport.use(new LocalStrategy({passReqToCallback: true,},
 	function (req, username, password, done) {
       let con = mysql.createConnection(dbInfo);
-      con.query(`SELECT * FROM users WHERE username=${mysql.escape(username)} OR email=${mysql.escape(username)};`, (error, results, fields) => {
+      con.query(`SELECT * FROM users WHERE username=${mysql.escape(username)} OR email=${mysql.escape(username)} OR parental_username=${mysql.escape(username)};`, (error, results, fields) => {
         if (error) {
           console.log(error.stack);
           con.end();
@@ -373,19 +381,36 @@ passport.use(new LocalStrategy({passReqToCallback: true,},
           con.end();
           return done(null, false, req.flash('error', 'Username/Email or Password is incorrect.'));
         } else {
-          if (bcrypt.compareSync(password, results[0].password)) {
-            console.log(`${username} successfully logged in.`);
-            let user = {
-                identifier: results[0].id,
-                username: results[0].username,
-                firstName: results[0].first_name,
-                lastName: results[0].last_name,
-            };
-            con.end();
-            return done(null, user);
+          if (username === results[0].parental_username) {
+            if (bcrypt.compareSync(password, results[0].parental_password)) {
+              console.log(`${results[0].parental_username} successfully logged in.`);
+              let user = {
+                  identifier: results[0].id,
+                  username: results[0].username,
+                  firstName: results[0].first_name,
+                  lastName: results[0].last_name,
+              };
+              con.end();
+              return done(null, user);
+            } else {
+              con.end();
+              return done(null, false, req.flash('error', 'Username/Email or Password is incorrect.'));
+            }
           } else {
-            con.end();
-            return done(null, false, req.flash('error', 'Username/Email or Password is incorrect.'));
+            if (bcrypt.compareSync(password, results[0].password)) {
+              console.log(`${username} successfully logged in.`);
+              let user = {
+                  identifier: results[0].id,
+                  username: results[0].username,
+                  firstName: results[0].first_name,
+                  lastName: results[0].last_name,
+              };
+              con.end();
+              return done(null, user);
+            } else {
+              con.end();
+              return done(null, false, req.flash('error', 'Username/Email or Password is incorrect.'));
+            }
           }
         }
       });

@@ -1,0 +1,171 @@
+{{> header}}
+				<div class="m-grid__item m-grid__item--fluid m-wrapper" style="text-align:center">
+						<div class="wrapper" id="Div1">
+						<img src="../../assets/app/media/img/misc/Settings.png">
+            <button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+            <div class="m-grid m-grid--hor m-grid--root m-page">
+							<div class="m-grid__item m-grid__item--fluid m-grid m-grid--hor m-login m-login--signin m-login--2 m-login-2--skin-2" id="m_login" style="background-image: url(../../../assets/app/media/img//bg/bg-3.jpg);">
+								<div class="m-grid__item m-grid__item--fluid	m-login__wrapper">
+									<div class="m-login__container">
+                    <form action="/user-settings/change-email" method="post">
+                      <div class="form-group m-form__group">
+                        <input class="form-control m-input" type="email" placeholder="New Email" name="newEmail" autocomplete="off">
+                      </div>
+                      <button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+                      <button type="submit" class="btn btn-primary" id="m_change_email">Change Email</button>
+                    </form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+						<button class="but" id="m_change_password" type="button" class="btn m-btn--square  btn-success m-btn--wide">Change Password</button>
+						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+						<button class="but" id="m_manage_notifications" type="button" class="btn m-btn--square  btn-success m-btn--wide">Manage Notifications</button>
+						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+						<a href="http://167.99.156.25/parental"><button class="but" id="m_add_parental" type="button" class="btn m-btn--square  btn-success m-btn--wide">Add parental</button></a>
+						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+						<div class="sliderWrapper">
+							<div>Currency (USD/CA)&nbsp;&nbsp;</div>
+							<label class="switch">
+								<input type="checkbox">
+								<span class="slider round"></span>
+							</label>
+						</div>
+						<div class="sliderWrapper">
+							<div>Light/Dark Theme&nbsp;&nbsp;</div>
+							<label class="switch">
+								<input type="checkbox" onclick="toggleClick()">
+								<span class="slider round"></span>
+							</label>
+						</div>
+						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+						<select>
+							<option selected disabled hidden>Color of categories</option>
+							<option value="Red">Red</option>
+							<option value="Blue">Blue</option>
+							<option value="Green">Green</option>
+							<option value="Purple">Purple</option>
+						</select>
+						<button class="inv" type="button" class="btn m-btn--square  btn-success m-btn--wide"></button>
+						<button class="dangerBut" type="button" class="btn m-btn--square  btn-warning m-btn--wide" onclick="deleteClick()">Delete Account</button>
+						</div>
+						<!--End::Main Portlet-->
+					</div>
+				</div>
+			{{> footer}}
+<script>
+function toggleClick() {
+	if(document.getElementById("Div1").style.backgroundColor==="rgb(0, 115, 230)") {
+		document.getElementById("Div1").style.backgroundColor="#ffffff";
+	}
+	else {
+  	document.getElementById("Div1").style.backgroundColor="#0073e6";
+	}
+}
+function deleteClick() {
+	var result = confirm("Are you sure you want to delete your account?");
+}
+</script>
+<style>
+  .but {
+		 /* display: block; */
+		padding:10px 3px 10px 3px;
+    background-color:#00cc00;
+    display: block;
+    border-radius:10px;
+    margin-top: 25px;
+		margin: 0 auto;
+  }
+	.dangerBut {
+		 /* display: block; */
+		padding:10px 3px 10px 3px;
+    background-color:#ff0000;
+    display: block;
+    border-radius:10px;
+    margin-top: 25px;
+		margin: 0 auto;
+  }
+	.wrapper {
+    text-align: center;
+		margin-top: 25px;
+	}
+	.inv {
+		padding:10px 3px 10px 3px;
+    border-radius:10px;
+		margin: 0 auto;
+		display: block;
+		outline: 0;
+		color: transparent;
+		background-color: transparent;
+		border-color: transparent
+	}
+	.sliderWrapper{
+		display: inline-block;
+		margin: 0px 24px 0px 24px;
+		postion:relative;
+	}
+  .sliderWrapper div{
+		display: inline-block;
+	}
+	.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+	}
+	/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+	}
+	/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #00cc00;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+</style>
+

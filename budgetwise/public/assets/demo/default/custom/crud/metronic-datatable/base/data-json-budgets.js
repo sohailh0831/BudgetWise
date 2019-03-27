@@ -35,10 +35,14 @@ var DatatableJsonRemoteDemo = {
                 title: "Amount Spent"
             }, {
                 field: "startDate",
-                title: "Start Date"
+                title: "Start Date",
+                type: "date",
+                format: "MM/DD/YYYY"
             }, {
                 field: "endDate",
                 title: "End Date",
+                type: "date",
+                format: "MM/DD/YYYY"
             }, {
                 field: "identifier",
                 title: "Analytics",
