@@ -157,7 +157,19 @@ function randomQuote() {
 								</div>
 							</div>
               <div class="m-portlet__body">
-								<h1> <input type="text" required="true" class="form-control m-input m-input--square" name="budgetName" placeholder="Enter Your Memo Here"> </h1>
+								<h1>
+                  <form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/addmemo" method="post">
+                  <div class="form-group m-form__group">
+												<label>Memo</label>
+												<input type="text" class="form-control m-input m-input--square" name="memoinput" placeholder="Enter Memo Here">
+											</div>
+                      <div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Save Memo</button>
+											</div>
+										</div>
+									</form>             
+                </h1>
 							</div>
 						</div>
             </div>
