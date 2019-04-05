@@ -370,7 +370,7 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
                 }
               });
             });
-            
+
           }
         }).catch(error => {
           console.log(error);
@@ -459,7 +459,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
           labels: []
      };
      let data = [];
-  
+
   BudgetFunctions.getCategoriesByUser(req.user.identifier)
   .then(categories => {
         for (let i = 0; i < dates.length; i++) {
@@ -489,7 +489,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
     console.log(error);
     return res.send();
   });
- 
+
 });
 
 router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
@@ -505,7 +505,7 @@ router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAut
   });
 });
 
-router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {  
+router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
 
 //   var cat = "";
@@ -521,22 +521,22 @@ router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, r
 //       //The app is executing the above line, but after it executes, cat is still just an empty string
 //     }
 //   });
-  
+
 //   console.log(cat);
 //   if(cat == "Retirement") {
-//     return res.render('platform/retirement.hbs'); 
+//     return res.render('platform/retirement.hbs');
 //   } else {
-//     return res.render('platform/view-category.hbs'); 
+//     return res.render('platform/view-category.hbs');
 //   }
   return res.render('platform/view-category.hbs', {
     firstName: req.user.firstName,
       lastName: req.user.lastName,
       username: req.user.username,
       pageName: 'Viewing Category',
-  }); 
+  });
 });
 
-router.post('/category-expenses/:id', (req, res) => {  
+router.post('/category-expenses/:id', (req, res) => {
   let con = mysql.createConnection(dbInfo);
   con.query(`SELECT * FROM expenses WHERE category=${mysql.escape(req.params.id)} AND user=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
@@ -576,7 +576,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < expenses.length; j++) {
             sum += expenses[j].price;
           }
-          
+
           let lastYear = new Date();
           lastYear.setDate(lastYear.getDate()-365);
           let year = [];
@@ -589,7 +589,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < year.length; j++) {
             ySum += year[j].price;
           }
-          
+
           let lastMonth = new Date();
           lastMonth.setDate(lastMonth.getDate()-30);
           let month = [];
@@ -602,7 +602,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < month.length; j++) {
             mSum += month[j].price;
           }
-          
+
           con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
             if (error) {
               console.log(error.stack);
@@ -614,7 +614,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
               return res.send();
             } else {
               retirementGoal = results[0].retirementGoal;
-              
+
               let goal = retirementGoal - sum;
               if(goal < 0) {
                 goal = 0;
@@ -644,6 +644,66 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
         });
       }
     }
+  });
+});
+
+router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+
+  let expenseNames = [];
+  let expenseFreqs = [];
+  let mostPurchased = [];
+  for (let weekday = 0; weekday < 7; weekday++) {
+    expenseNames.push([]);
+    expenseFreqs.push([]);
+    mostPurchased.push(-1);
+  }
+  con.query(`SELECT * FROM expenses WHERE owner=${mysql.escape(req.user.identifier)};`, (error, expenses, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+    }
+
+    for (let i = 0; i < expenses.length; i++) {
+      let expenseDate = new Date(expenses[i].createionDate);
+      let dayVal = expenseDate.getDay();
+      let name = expenses[i].name.toLowerCase();
+      let arrayLoc = expenseNames[dayVal].indexOf(name);
+      if(arrayLoc == -1) {
+        expenseNames[dayVal].push(name);
+        expenseFreqs[dayVal].push(1);
+      } else {
+        expenseFreqs[dayVal][arrayLoc] += 1;
+      }
+
+      let mostIndex = mostPurchased[dayVal];
+      if(mostIndex == -1 || expenseFreqs[dayVal][mostIndex] < expenseFreqs[dayVal][arrayLoc]) {
+         mostIndex = arrayLoc;
+      }
+    }
+
+    let topExpenses = [];
+    let finalFreqs = [];
+    for(weekday = 0; weekday < 7; weekday++) {
+      if(mostPurchased[weekday] != -1) {
+        topExpenses.push(expenseNames[weekday][mostPurchased]);
+        finalFreqs.push(expenseFreqs[weekday][mostPurchased]);
+      } else {
+        topExpenses.push('No expenses entered.')
+        finalFreqs.push('-');
+      }
+    }
+
+    con.end();
+    return res.render('platform/expense-analytics.hbs', {
+      expenses: topExpenses,
+      expenseFrequencies: finalFreqs,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      username: req.user.username,
+      pageName: 'Expense Analytics',
+    });
   });
 });
 
