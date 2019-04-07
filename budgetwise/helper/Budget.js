@@ -119,6 +119,75 @@ function getExpensesFromUserAndDate(userID, date, data, categories) {
   })
 }
 
+function getTopFiveItems(userID) {
+  return new Promise(function(resolve, reject) {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM expenses WHERE user=${mysql.escape(userID)} ORDER BY name;`, (error, expenses, fields) => {
+        if (error) {
+            console.log(error.stack);
+            con.end();
+            return reject(error);
+        }
+        var items = new Array();
+        var prices = new Array();
+        for (let i = 0; i < expenses.length; i++) {
+          if(items.includes(expenses[i].name)) {
+            var index = items.indexOf(expenses[i].name);
+            prices[index] += expenses[i].price;
+          }
+          else {
+            items.push(expenses[i].name);
+            prices.push(expenses[i].price);
+          }
+        }
+        var topFiveItems = new Array();
+        var topFivePrices = new Array();
+        for (let i = 0; i < items.length; i++) {
+          if(topFiveItems.length < 6) {
+            topFiveItems.push(items[i]);
+            topFivePrices.push(prices[i]);
+          }
+          else {
+            var small = prices[i];
+            var ind = -1;
+            for(let j = 0; j < topFivePrices.length; j++) {
+              if(small > topFivePrices[j]) {
+                small = topFivePrices[j];
+                ind = j;
+              }
+            }
+            if(j != -1) {
+              topFivePrices[j] = prices[j];
+              topFiveItems[j] = items[j];
+            }
+          }
+        }
+        var topFiveSortedItems = new Array();
+        var topFiveSortedPrices = new Array();
+        for(let j = 0; j < topFiveItems; j++) {
+          for (let i = 0; i < topFiveItems; i++) {
+            var high = -1;
+            var ind = 0;
+            if(topFiveSortedItems.includes(topFiveItems[i]) == false) {
+              if(topFivePrices[i] > high) {
+                high = topFiveItems[i];
+                ind = i;
+              }
+            }
+          }
+          topFiveSortedItems.push(topFiveItems[ind]);
+          topFiveSortedPrices.push(topFivePrices[ind]);
+        }
+        var topFiveSorted = [[],[]];
+        for(let i = 0; i < topFiveSortedItems; i++) {
+          topFiveSorted.push([topFiveSortedItems[i], topFiveSortedPrices[i]]);
+        }
+        con.end();
+        return resolve(topFiveSorted);
+    });
+  })
+}
+
 async function buildGraph(data, categories, userID, date) {
     let res = await getExpensesFromUserAndDate(userID, date, data, categories);
     return res;
@@ -131,7 +200,7 @@ module.exports = {
   addExpenseToBudgets,
   getCategoriesByUser,
   buildGraph,
-  
+
 
 
 }
