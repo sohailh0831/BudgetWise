@@ -127,7 +127,7 @@ router.post('/dashboard/addmemo', AuthenticationFunctions.ensureAuthenticated, (
     if (formErrors) {
 		    req.flash('error', formErrors[0].msg);
         return res.redirect('/dashboard');
-	  } 
+	  }
   let con = mysql.createConnection(dbInfo);
   con.query(`UPDATE users SET memo = ${mysql.escape(memoin)} WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
@@ -138,7 +138,7 @@ router.post('/dashboard/addmemo', AuthenticationFunctions.ensureAuthenticated, (
     con.end();
     req.flash('success', 'Memo successfully updated.');
     return res.redirect('/dashboard');
-  }); 
+  });
 });
 
 
@@ -418,7 +418,7 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
                 }
               });
             });
-            
+
           }
         }).catch(error => {
           console.log(error);
@@ -429,11 +429,83 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
 
 
 router.get('/categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  return res.render('platform/categories.hbs', {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM categories WHERE owner=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+    } else if (results.length < 1) {
+      console.log(error.stack);
+      con.end();
+      return res.send();
+    }
+    con.end();
+    let catStr = '';
+
+    if(results.length > 0) {
+      catStr = results[0].name;
+      for(let i = 1; i < results.length; i++) {
+        catStr = catStr.concat(', ');
+        catStr = catStr.concat(results[i].name);
+      }
+    }
+
+    return res.render('platform/categories.hbs', {
+      categories: catStr,
       firstName: req.user.firstName,
       lastName: req.user.lastName,
       username: req.user.username,
       pageName: 'Categories',
+    });
+  });
+});
+
+router.post('/categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM categories WHERE owner=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+    } else if (results.length < 1) {
+      console.log(error.stack);
+      con.end();
+      return res.send();
+    }
+
+    let catStr = results[0].name;
+    for(let i = 1; i < results.length; i++) {
+      catStr = catStr.concat(',');
+      catStr = catStr.concat(results[i].name);
+    }
+
+    function getSum(total, num) {
+      return total + num;
+    }
+
+    let ratios = req.body.ratios.split(",");
+    ratios = ratios.map(Number);
+    if(ratios.length != results.length || ratios.reduce(getSum) != 100) {
+      req.flash('error', 'Please assign a value to each category such that the sum of all assigned values is 100');
+      //THIS LOOP RUNS, BUT THE FLASH ABOVE DOESN'T WORK
+      con.end();
+      return res.render('platform/categories.hbs', {
+        categories: catStr,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        username: req.user.username,
+        pageName: 'Categories',
+      });
+    }
+
+    return res.render('platform/categories.hbs', {
+      categories: catStr,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      username: req.user.username,
+      pageName: 'Categories',
+    });
   });
 });
 
@@ -507,7 +579,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
           labels: []
      };
      let data = [];
-  
+
   BudgetFunctions.getCategoriesByUser(req.user.identifier)
   .then(categories => {
         for (let i = 0; i < dates.length; i++) {
@@ -537,7 +609,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
     console.log(error);
     return res.send();
   });
- 
+
 });
 
 router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
@@ -553,17 +625,17 @@ router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAut
   });
 });
 
-router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {  
+router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
   return res.render('platform/view-category.hbs', {
     firstName: req.user.firstName,
       lastName: req.user.lastName,
       username: req.user.username,
       pageName: 'Viewing Category',
-  }); 
+  });
 });
 
-router.post('/category-expenses/:id', (req, res) => {  
+router.post('/category-expenses/:id', (req, res) => {
   let con = mysql.createConnection(dbInfo);
   con.query(`SELECT * FROM expenses WHERE category=${mysql.escape(req.params.id)} AND user=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
@@ -603,7 +675,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < expenses.length; j++) {
             sum += expenses[j].price;
           }
-          
+
           let lastYear = new Date();
           lastYear.setDate(lastYear.getDate()-365);
           let year = [];
@@ -616,7 +688,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < year.length; j++) {
             ySum += year[j].price;
           }
-          
+
           let lastMonth = new Date();
           lastMonth.setDate(lastMonth.getDate()-30);
           let month = [];
@@ -629,7 +701,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < month.length; j++) {
             mSum += month[j].price;
           }
-          
+
           con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
             if (error) {
               console.log(error.stack);
@@ -641,7 +713,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
               return res.send();
             } else {
               retirementGoal = results[0].retirementGoal;
-              
+
               let goal = retirementGoal - sum;
               if(goal < 0) {
                 goal = 0;

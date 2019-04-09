@@ -19,8 +19,8 @@ p{{> header}}
 						{{/if}}
 
 
-              
-              
+
+
               <div class="m-portlet m-portlet--mobile">
 							<div class="m-portlet__head">
 								<div class="m-portlet__head-caption">
@@ -39,14 +39,49 @@ p{{> header}}
 								<!--end: Datatable -->
 							</div>
 						</div>
-              
-              
-              
-            
+
+            <!--begin::Portlet-->
+            <div class="m-portlet">
+              <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                  <div class="m-portlet__head-title">
+                    <span class="m-portlet__head-icon m--hide">
+                      <i class="la la-gear"></i>
+                    </span>
+                    <h3 class="m-portlet__head-text">
+                      Update Category Spending Ratios
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+              <!--begin::Form-->
+              <form class="m-form" action="/categories" method="post">
+                <div class="m-portlet__body">
+                  <div class="m-widget12__item">
+                    <span class="m-widget12__text1">Please enter a comma separated list of the ratios that you would like to have your budget divided by for the categories in the order listed below.<br>For example, to set spending ratios for categories "food, travel, bills" to 30%, 25%, and 45% respectively, enter 30,25,45 in the box below. <br><br>
+                      <span>{{categories}}<br><br></span>
+                    </span>
+                  </div>
+                  <div class="m-form__section m-form__section--first">
+                    <div class="form-group m-form__group">
+                      <label>New Category Spending Ratios</label>
+                      <input type="text" name="ratios" class="form-control m-input">
+                    </div>
+                  </div>
+                </div>
+                <div class="m-portlet__foot m-portlet__foot--fit">
+                  <div class="m-form__actions m-form__actions">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </div>
+              </form>
+              <!--end::Form-->
+            </div>
+
+            <!--end::Portlet-->
 
 						<!--End::Main Portlet-->
 					</div>
 				</div>
 			{{> footer}}
-
-
