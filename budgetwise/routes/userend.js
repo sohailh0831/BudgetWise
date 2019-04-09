@@ -677,14 +677,18 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
 router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
 
-  let expenseNames = [];
-  let expenseFreqs = [];
+  let expenseDayNames = [];
+  let expenseDayFreqs = [];
   let mostPurchased = [];
+
   for (let weekday = 0; weekday < 7; weekday++) {
-    expenseNames.push([]);
-    expenseFreqs.push([]);
+    expenseDayNames.push([]);
+    expenseDayFreqs.push([]);
     mostPurchased.push(-1);
   }
+
+  let expenseNames = [];
+  let expenseTotals = [];
 
   con.query(`SELECT * FROM expenses WHERE user=${mysql.escape(req.user.identifier)};`, (error, expenses, fields) => {
     if (error) {
@@ -694,52 +698,92 @@ router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (r
     }
 
     for (let i = 0; i < expenses.length; i++) {
+      let name = expenses[i].name.toLowerCase();
+
       let expenseDate = new Date(expenses[i].creationDate);
       let dayVal = expenseDate.getDay();
-      let name = expenses[i].name.toLowerCase();
-      let arrayLoc = expenseNames[dayVal].indexOf(name);
+      let arrayLoc = expenseDayNames[dayVal].indexOf(name);
+
       if(arrayLoc == -1) {
-        expenseNames[dayVal].push(name);
-        expenseFreqs[dayVal].push(1);
+        expenseDayNames[dayVal].push(name);
+        expenseDayFreqs[dayVal].push(1);
       } else {
-        expenseFreqs[dayVal][arrayLoc] += 1;
+        expenseDayFreqs[dayVal][arrayLoc] += 1;
+      }
+
+      arrayLoc = expenseNames.indexOf(name);
+
+      if(arrayLoc != -1) {
+        expenseTotals[arrayLoc] += expenses[i].price;
+      } else {
+        expenseNames.push(name);
+        expenseTotals.push(expenses[i].price);
       }
 
       let mostIndex = mostPurchased[dayVal];
-      if(mostIndex == -1 || expenseFreqs[dayVal][mostIndex] < expenseFreqs[dayVal][arrayLoc]) {
+      if(mostIndex == -1 || expenseDayFreqs[dayVal][mostIndex] < expenseDayFreqs[dayVal][arrayLoc]) {
          mostPurchased[dayVal] = arrayLoc;
       }
     }
 
-    let topExpenses = [];
+    let topDayExpenses = [];
     let finalFreqs = [];
     for(weekday = 0; weekday < 7; weekday++) {
       if(mostPurchased[weekday] != -1) {
-        topExpenses.push(expenseNames[weekday][mostPurchased[weekday]]);
-        finalFreqs.push(expenseFreqs[weekday][mostPurchased[weekday]]);
+        topDayExpenses.push(expenseDayNames[weekday][mostPurchased[weekday]]);
+        finalFreqs.push(expenseDayFreqs[weekday][mostPurchased[weekday]]);
       } else {
-        topExpenses.push('No expenses entered.')
+        topDayExpenses.push('-');
         finalFreqs.push('-');
       }
     }
 
+    let topExpenses = [];
+    let topCosts = [];
+    let max
+    for(let j = 0; j < 5; j++) {
+      if (expenseNames === undefined || expenseNames.length == 0) {
+        topExpenses.push('-');
+        topCosts.push('-');
+      } else {
+        let max = Math.max.apply(Math, expenseTotals);
+        let index = expenseTotals.indexOf(max);
+        topExpenses.push(expenseNames[index]);
+        topCosts.push(expenseTotals[index]);
+        expenseNames.splice(index, 1);
+        expenseTotals.splice(index, 1);
+        console.log(topExpenses[j]);
+      }
+    }
+    console.log(topExpenses[0]);
+
     con.end();
 
     return res.render('platform/expense-analytics.hbs', {
-      expense0: topExpenses[0],
+      expense0: topDayExpenses[0],
+      expense1: topDayExpenses[1],
+      expense2: topDayExpenses[2],
+      expense3: topDayExpenses[3],
+      expense4: topDayExpenses[4],
+      expense5: topDayExpenses[5],
+      expense6: topDayExpenses[6],
       expenseFrequency0: finalFreqs[0],
-      expense1: topExpenses[1],
       expenseFrequency1: finalFreqs[1],
-      expense2: topExpenses[2],
       expenseFrequency2: finalFreqs[2],
-      expense3: topExpenses[3],
       expenseFrequency3: finalFreqs[3],
-      expense4: topExpenses[4],
       expenseFrequency4: finalFreqs[4],
-      expense5: topExpenses[5],
       expenseFrequency5: finalFreqs[5],
-      expense6: topExpenses[6],
       expenseFrequency6: finalFreqs[6],
+      expenseName1: topExpenses[0],
+      expenseName2: topExpenses[1],
+      expenseName3: topExpenses[2],
+      expenseName4: topExpenses[3],
+      expenseName5: topExpenses[4],
+      expenseCost1: topCosts[0],
+      expenseCost2: topCosts[1],
+      expenseCost3: topCosts[2],
+      expenseCost4: topCosts[3],
+      expenseCost5: topCosts[4],
       firstName: req.user.firstName,
       lastName: req.user.lastName,
       username: req.user.username,
