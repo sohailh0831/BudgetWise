@@ -41,16 +41,24 @@ router.get('/dashboard', AuthenticationFunctions.ensureAuthenticated, (req, res)
           con.end();
           return res.send();
       }
-      con.end();
-      return res.render('platform/dashboard.hbs', {
-        categories: categories,
-        individuals: individuals,
-        error: req.flash('error'),
-        success: req.flash('success'),
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-        username: req.user.username,
-        pageName: 'Dashboard',
+      con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, user, fields) => {
+        if (error) {
+            console.log(error.stack);
+            con.end();
+            return res.send();
+        }
+        con.end();
+        return res.render('platform/dashboard.hbs', {
+          categories: categories,
+          individuals: individuals,
+          error: req.flash('error'),
+          success: req.flash('success'),
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          username: req.user.username,
+          pageName: 'Dashboard',
+          memo: user[0].memo,
+        });
       });
     });
   });
@@ -113,18 +121,14 @@ router.post('/dashboard/add-category', AuthenticationFunctions.ensureAuthenticat
 });
 
 router.post('/dashboard/addmemo', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  let memoin = req.body.memoinput;
-  req.checkBody('memoinput', 'Cannot Save Empty Memo').notEmpty();
+  let memoin = req.body.memoInput;
+  req.checkBody('memoInput', 'Cannot save empty memo').notEmpty();
   let formErrors = req.validationErrors();
     if (formErrors) {
 		    req.flash('error', formErrors[0].msg);
         return res.redirect('/dashboard');
-	  }
-
-
+	  } 
   let con = mysql.createConnection(dbInfo);
-  //let categoryID = uuidv4();
-  //UPDATE users SET memo WHERE id=${mysql.escape(req.body.individualChoice)};
   con.query(`UPDATE users SET memo = ${mysql.escape(memoin)} WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
         console.log(error.stack);
@@ -134,8 +138,7 @@ router.post('/dashboard/addmemo', AuthenticationFunctions.ensureAuthenticated, (
     con.end();
     req.flash('success', 'Memo successfully updated.');
     return res.redirect('/dashboard');
-  });
-
+  }); 
 });
 
 
@@ -223,6 +226,23 @@ router.get('/dashboard/delete-christmas-budget', AuthenticationFunctions.ensureA
     });
   });
 });
+
+
+router.get('/dashboard/deletememo', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+con.query(`UPDATE users SET memo = "" WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+    }
+      req.flash('success', 'Deleted Memo.');
+      return res.redirect('/dashboard');
+    });
+});
+
+
+
 
 router.post('/dashboard/add-christmas-budget', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   req.checkBody('budgetName', 'Budget Name field is required.').notEmpty();
@@ -353,6 +373,7 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
   req.checkBody('expenseName', 'Expense name field is required.').notEmpty();
   req.checkBody('expensePrice', 'Expense price field is required.').notEmpty();
   req.checkBody('category', 'Category field is required.').notEmpty();
+  req.checkBody('expenseDescription', 'Expense description field is required.').notEmpty();
   if (recurringExpense === "yes") {
     req.checkBody('recurringEndDate', 'End Date for the recurring expense is required.').notEmpty();
     req.checkBody('recurringTime', 'Recurring Time Interval for the recurring expense is required.').notEmpty();
@@ -373,7 +394,7 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
                   con.end();
                   return res.send();
               }
-              con.query(`INSERT INTO expenses (id, name, price, category, user) VALUES (${mysql.escape(expenseID)}, ${mysql.escape(expenseName)}, ${mysql.escape(expensePrice)}, ${mysql.escape(expenseCategoryID)}, ${mysql.escape(req.user.identifier)})`, (error, results, fields) => {
+              con.query(`INSERT INTO expenses (id, name, price, category, user, description) VALUES (${mysql.escape(expenseID)}, ${mysql.escape(expenseName)}, ${mysql.escape(expensePrice)}, ${mysql.escape(expenseCategoryID)}, ${mysql.escape(req.user.identifier)}, ${mysql.escape(req.body.expenseDescription)})`, (error, results, fields) => {
                 if (error) {
                     console.log(error.stack);
                     con.end();
@@ -397,7 +418,7 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
                 }
               });
             });
-
+            
           }
         }).catch(error => {
           console.log(error);
@@ -486,7 +507,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
           labels: []
      };
      let data = [];
-
+  
   BudgetFunctions.getCategoriesByUser(req.user.identifier)
   .then(categories => {
         for (let i = 0; i < dates.length; i++) {
@@ -516,7 +537,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
     console.log(error);
     return res.send();
   });
-
+ 
 });
 
 router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
@@ -532,38 +553,17 @@ router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAut
   });
 });
 
-router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {  
   let con = mysql.createConnection(dbInfo);
-
-//   var cat = "";
-//   con.query(`SELECT * FROM categories WHERE id=${mysql.escape(req.params.id)} AND owner=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
-//     if (error) {
-//         console.log(error.stack);
-//         con.end();
-//     }
-//     else if (results.length != 1) {
-//       con.end();
-//     } else {
-//       cat = results[0].name;
-//       //The app is executing the above line, but after it executes, cat is still just an empty string
-//     }
-//   });
-
-//   console.log(cat);
-//   if(cat == "Retirement") {
-//     return res.render('platform/retirement.hbs');
-//   } else {
-//     return res.render('platform/view-category.hbs');
-//   }
   return res.render('platform/view-category.hbs', {
     firstName: req.user.firstName,
       lastName: req.user.lastName,
       username: req.user.username,
       pageName: 'Viewing Category',
-  });
+  }); 
 });
 
-router.post('/category-expenses/:id', (req, res) => {
+router.post('/category-expenses/:id', (req, res) => {  
   let con = mysql.createConnection(dbInfo);
   con.query(`SELECT * FROM expenses WHERE category=${mysql.escape(req.params.id)} AND user=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
@@ -603,7 +603,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < expenses.length; j++) {
             sum += expenses[j].price;
           }
-
+          
           let lastYear = new Date();
           lastYear.setDate(lastYear.getDate()-365);
           let year = [];
@@ -616,7 +616,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < year.length; j++) {
             ySum += year[j].price;
           }
-
+          
           let lastMonth = new Date();
           lastMonth.setDate(lastMonth.getDate()-30);
           let month = [];
@@ -629,7 +629,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < month.length; j++) {
             mSum += month[j].price;
           }
-
+          
           con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
             if (error) {
               console.log(error.stack);
@@ -641,7 +641,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
               return res.send();
             } else {
               retirementGoal = results[0].retirementGoal;
-
+              
               let goal = retirementGoal - sum;
               if(goal < 0) {
                 goal = 0;
@@ -792,6 +792,63 @@ router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (r
   });
 });
 
+router.get('/expense/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM expenses WHERE id=${mysql.escape(req.params.id)};`, (error, expense, fields) => {
+    if (error) {
+      con.end();
+      console.log(error.stack);
+      return res.send();
+    }
+    if (expense.length === 1) {
+      con.query(`SELECT * FROM categories WHERE owner='${req.user.identifier}';`, (error, categories, fields) => {
+        if (error) {
+          con.end();
+          console.log(error.stack);
+          return res.send();
+        }
+        con.end();
+        return res.render('platform/view-expense.hbs', {
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          username: req.user.username,
+          pageName: `Viewing Expense: ${expense[0].name}`,
+          expense: expense[0],
+          categories: categories,
+        });
+      });
+    } else {
+      req.flash('error', 'Expense not found.');
+      con.end();
+      return res.redirect('/categories');
+    }
+  });
+});
+
+router.post('/update-expense/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  console.log(req.body);
+  req.checkBody('expenseName', 'Expense name field is required.').notEmpty();
+    req.checkBody('expensePrice', 'Expense price field is required.').notEmpty();
+    req.checkBody('expenseDescription', 'Expense description field is required.').notEmpty();
+    req.checkBody('expenseCategory', 'Expense category choice is required.').notEmpty();
+    let formErrors = req.validationErrors();
+    if (formErrors) {
+		    req.flash('error', formErrors[0].msg);
+        return res.redirect(`/expense/${req.params.id}`);
+	  }
+  let con = mysql.createConnection(dbInfo);
+  con.query(`UPDATE expenses SET name=${mysql.escape(req.body.expenseName)}, price=${mysql.escape(req.body.expensePrice)}, category=${mysql.escape(req.body.expenseCategory)}, description=${mysql.escape(req.body.expenseDescription)} WHERE id=${mysql.escape(req.params.id)} AND user=${mysql.escape(req.user.identifier)};`, (error, expense, fields) => {
+    if (error) {
+      con.end();
+      console.log(error.stack);
+      return res.send();
+    }
+    con.end();
+    req.flash('success', 'Successfully updated.');
+    return res.redirect(`/expense/${req.params.id}`);
+  });
+});
+
 router.get('/settings', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
   con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
@@ -815,6 +872,75 @@ router.get('/settings', AuthenticationFunctions.ensureAuthenticated, (req, res) 
       con.end();
       req.flash('error', 'Error.');
       return res.redirect('/dashboard');
+    }
+  });
+});
+
+router.post('/user/delete-profile', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, user, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+    }
+    if (user.length == 1) {
+      if (bcrypt.compareSync(req.body.password, user[0].password)) {
+        con.query(`DELETE FROM budgets WHERE user=${mysql.escape(req.user.identifier)};`, (error, deleteBudgetsResults, fields) => {
+          if (error) {
+              console.log(error.stack);
+              con.end();
+              return res.send();
+          }
+          con.query(`DELETE FROM categories WHERE owner=${mysql.escape(req.user.identifier)};`, (error, deleteCategoriesResults, fields) => {
+            if (error) {
+                console.log(error.stack);
+                con.end();
+                return res.send();
+            }
+            con.query(`DELETE FROM expenses WHERE user=${mysql.escape(req.user.identifier)};`, (error, deleteExpensesResults, fields) => {
+              if (error) {
+                  console.log(error.stack);
+                  con.end();
+                  return res.send();
+              }
+              con.query(`DELETE FROM special_budgets WHERE user=${mysql.escape(req.user.identifier)};`, (error, deleteSpecialBudgetsResults, fields) => {
+                if (error) {
+                    console.log(error.stack);
+                    con.end();
+                    return res.send();
+                }
+                con.query(`DELETE FROM special_budget_individual WHERE user=${mysql.escape(req.user.identifier)};`, (error, deleteSpecialBudgetIndividuals, fields) => {
+                  if (error) {
+                      console.log(error.stack);
+                      con.end();
+                      return res.send();
+                  }
+                  con.query(`DELETE FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, deleteUserResults, fields) => {
+                    if (error) {
+                        console.log(error.stack);
+                        con.end();
+                        return res.send();
+                    }
+                    con.end();
+                    req.logout();
+                    req.session.destroy();
+                    return res.redirect('/login');
+                  });
+                });
+              });
+            });
+          });
+        });
+      } else {
+        con.end();
+        req.flash('error', 'Incorrect password.');
+        return res.redirect('/settings');
+      }
+    } else {
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/settings');
     }
   });
 });
