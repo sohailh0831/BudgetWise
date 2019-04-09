@@ -20,7 +20,7 @@
             <!--Begin::Main Portlet-->
 
             <div class="row">
-              <div class="col-xl-6">
+              <div class="col-xl-8">
 
 								<!--begin:: Widgets/Expense Analytics-->
 
@@ -29,67 +29,15 @@
 										<div class="m-portlet__head-caption">
 											<div class="m-portlet__head-title">
 												<h3 class="m-portlet__head-text">
-													Support Cases
+													Most Frequent Expenses by Day
 												</h3>
 											</div>
-										</div>
-										<div class="m-portlet__head-tools">
-											<ul class="m-portlet__nav">
-												<li class="m-portlet__nav-item m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-right m-dropdown--align-push" m-dropdown-toggle="hover" aria-expanded="true">
-													<a href="#" class="m-portlet__nav-link m-portlet__nav-link--icon m-portlet__nav-link--icon-xl m-dropdown__toggle">
-														<i class="la la-ellipsis-h m--font-brand"></i>
-													</a>
-													<div class="m-dropdown__wrapper">
-														<span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
-														<div class="m-dropdown__inner">
-															<div class="m-dropdown__body">
-																<div class="m-dropdown__content">
-																	<ul class="m-nav">
-																		<li class="m-nav__section m-nav__section--first">
-																			<span class="m-nav__section-text">Quick ActTions</span>
-																		</li>
-																		<li class="m-nav__item">
-																			<a href="" class="m-nav__link">
-																				<i class="m-nav__link-icon flaticon-share"></i>
-																				<span class="m-nav__link-text">Activity</span>
-																			</a>
-																		</li>
-																		<li class="m-nav__item">
-																			<a href="" class="m-nav__link">
-																				<i class="m-nav__link-icon flaticon-chat-1"></i>
-																				<span class="m-nav__link-text">Messages</span>
-																			</a>
-																		</li>
-																		<li class="m-nav__item">
-																			<a href="" class="m-nav__link">
-																				<i class="m-nav__link-icon flaticon-info"></i>
-																				<span class="m-nav__link-text">FAQ</span>
-																			</a>
-																		</li>
-																		<li class="m-nav__item">
-																			<a href="" class="m-nav__link">
-																				<i class="m-nav__link-icon flaticon-lifebuoy"></i>
-																				<span class="m-nav__link-text">Support</span>
-																			</a>
-																		</li>
-																		<li class="m-nav__separator m-nav__separator--fit">
-																		</li>
-																		<li class="m-nav__item">
-																			<a href="#" class="btn btn-outline-danger m-btn m-btn--pill m-btn--wide btn-sm">Cancel</a>
-																		</li>
-																	</ul>
-																</div>
-															</div>
-														</div>
-													</div>
-												</li>
-											</ul>
 										</div>
 									</div>
 									<div class="m-portlet__body">
 										<div class="m-widget16">
 											<div class="row">
-												<div class="col-md-5">
+												<div class="col-lg-10">
 													<div class="m-widget16__head">
 														<div class="m-widget16__item">
 															<span class="m-widget16__sceduled">
@@ -111,10 +59,10 @@
 																Sunday
 															</span>
                               <span class="m-widget16__price m--align-right m--font-brand">
-																{{expenses[0]}}
+																{{expense0}}
 															</span>
 															<span class="m-widget16__price m--align-right m--font-brand">
-																{{expenseFrequencies[0]}}
+																{{expenseFrequency0}}
 															</span>
 														</div>
 
@@ -126,10 +74,10 @@
 																Monday
 															</span>
                               <span class="m-widget16__price m--align-right m--font-brand">
-																{{expenses[1]}}
+																{{expense1}}
 															</span>
 															<span class="m-widget16__price m--align-right m--font-brand">
-																{{expenseFrequencies[1]}}
+																{{expenseFrequency1}}
 															</span>
 														</div>
 
@@ -141,10 +89,10 @@
 																Tuesday
 															</span>
                               <span class="m-widget16__price m--align-right m--font-brand">
-																{{expenses[2]}}
+																{{expense2}}
 															</span>
 															<span class="m-widget16__price m--align-right m--font-brand">
-																{{expenseFrequencies[2]}}
+																{{expenseFrequency2}}
 															</span>
 														</div>
 
@@ -156,10 +104,10 @@
 																Wednesday
 															</span>
                               <span class="m-widget16__price m--align-right m--font-brand">
-																{{expenses[3]}}
+																{{expense3}}
 															</span>
 															<span class="m-widget16__price m--align-right m--font-brand">
-																{{expenseFrequencies[3]}}
+																{{expenseFrequency3}}
 															</span>
 														</div>
 
@@ -171,10 +119,10 @@
 																Thursday
 															</span>
                               <span class="m-widget16__price m--align-right m--font-brand">
-																{{expenses[4]}}
+																{{expense4}}
 															</span>
 															<span class="m-widget16__price m--align-right m--font-brand">
-																{{expenseFrequencies[4]}}
+																{{expenseFrequency4}}
 															</span>
 														</div>
 
@@ -186,10 +134,10 @@
 																Friday
 															</span>
                               <span class="m-widget16__price m--align-right m--font-brand">
-																{{expenses[5]}}
+																{{expense5}}
 															</span>
 															<span class="m-widget16__price m--align-right m--font-brand">
-																{{expenseFrequencies[5]}}
+																{{expenseFrequency5}}
 															</span>
 														</div>
 
@@ -201,36 +149,14 @@
 																Saturday
 															</span>
                               <span class="m-widget16__price m--align-right m--font-brand">
-																{{expenses[6]}}
+																{{expense6}}
 															</span>
 															<span class="m-widget16__price m--align-right m--font-brand">
-																{{expenseFrequencies[6]}}
+																{{expenseFrequency6}}
 															</span>
 														</div>
 
 														<!--end::widget item-->
-													</div>
-												</div>
-												<div class="col-md-7">
-													<div class="m-widget16__stats">
-														<div class="m-widget16__visual">
-															<div id="m_chart_support_tickets" style="height: 180px">
-															</div>
-														</div>
-														<div class="m-widget16__legends">
-															<div class="m-widget16__legend">
-																<span class="m-widget16__legend-bullet m--bg-info"></span>
-																<span class="m-widget16__legend-text">20% Margins</span>
-															</div>
-															<div class="m-widget16__legend">
-																<span class="m-widget16__legend-bullet m--bg-accent"></span>
-																<span class="m-widget16__legend-text">80% Profit</span>
-															</div>
-															<div class="m-widget16__legend">
-																<span class="m-widget16__legend-bullet m--bg-danger"></span>
-																<span class="m-widget16__legend-text">10% Lost</span>
-															</div>
-														</div>
 													</div>
 												</div>
 											</div>
