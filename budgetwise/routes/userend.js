@@ -148,7 +148,7 @@ router.post('/dashboard/addlimit', AuthenticationFunctions.ensureAuthenticated, 
   let formErrors = req.validationErrors();
     if (formErrors) {
 		    req.flash('error', formErrors[0].msg);
-        return res.redirect('/dashboard');
+        return res.redirect('/expense-analytics');
 	  }
   let con = mysql.createConnection(dbInfo);
   con.query(`UPDATE users SET limitExpense = ${mysql.escape(limitin)} WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
@@ -159,7 +159,7 @@ router.post('/dashboard/addlimit', AuthenticationFunctions.ensureAuthenticated, 
     }
     con.end();
     req.flash('success', 'Limit successfully updated.');
-    return res.redirect('/dashboard');
+    return res.redirect('/expense-analytics');
   });
 });
 
@@ -265,7 +265,7 @@ con.query(`UPDATE users SET memo = "" WHERE users.id = ${mysql.escape(req.user.i
 
 router.get('/dashboard/deletelimit', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
-con.query(`UPDATE users SET limitExpense = "" WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+con.query(`UPDATE users SET limitExpense = 0 WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
         console.log(error.stack);
         con.end();
@@ -629,6 +629,9 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
 
           let catTotals = [];
 
+          let allow = Math.round(budgets[0].allowance *100 ) / 100;
+          let as = Math.round(budgets[0].amountSpent *100 ) / 100;
+
           for(let i = 0; i < categories.length; i++) {
             catTotals.push(0);
             if(categories[i].spendPercent == 0) {
@@ -636,6 +639,8 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
               over = '-';
               return res.render('platform/view-budget.hbs', {
                 budget: budgets[0],
+                allowance: allow,
+                amountSpent: as,
                 underSpending: under,
                 overSpending: over,
                 firstName: req.user.firstName,
@@ -989,103 +994,111 @@ router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (r
         con.end();
         return res.send();
     }
+    con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, usersArray, fields) => {
+      if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+      }
+      for (let i = 0; i < expenses.length; i++) {
+        let name = expenses[i].name.toLowerCase();
 
-    for (let i = 0; i < expenses.length; i++) {
-      let name = expenses[i].name.toLowerCase();
+        let expenseDate = new Date(expenses[i].creationDate);
+        let dayVal = expenseDate.getDay();
+        let arrayLoc = expenseDayNames[dayVal].indexOf(name);
 
-      let expenseDate = new Date(expenses[i].creationDate);
-      let dayVal = expenseDate.getDay();
-      let arrayLoc = expenseDayNames[dayVal].indexOf(name);
+        if(arrayLoc == -1) {
+          expenseDayNames[dayVal].push(name);
+          expenseDayFreqs[dayVal].push(1);
+          arrayLoc = expenseDayNames[dayVal].indexOf(name);
+        } else {
+          expenseDayFreqs[dayVal][arrayLoc] += 1;
+        }
 
-      if(arrayLoc == -1) {
-        expenseDayNames[dayVal].push(name);
-        expenseDayFreqs[dayVal].push(1);
-        arrayLoc = expenseDayNames[dayVal].indexOf(name);
-      } else {
-        expenseDayFreqs[dayVal][arrayLoc] += 1;
+        let mostIndex = mostPurchased[dayVal];
+        if(mostIndex == -1 || expenseDayFreqs[dayVal][mostIndex] < expenseDayFreqs[dayVal][arrayLoc]) {
+          mostPurchased[dayVal] = arrayLoc;
+        }
+
+        arrayLoc = expenseNames.indexOf(name);
+
+        if(arrayLoc != -1) {
+          expenseTotals[arrayLoc] += expenses[i].price;
+        } else {
+          expenseNames.push(name);
+          expenseTotals.push(expenses[i].price);
+        }
       }
 
-      let mostIndex = mostPurchased[dayVal];
-      if(mostIndex == -1 || expenseDayFreqs[dayVal][mostIndex] < expenseDayFreqs[dayVal][arrayLoc]) {
-        mostPurchased[dayVal] = arrayLoc;
+      let topDayExpenses = [];
+      let finalFreqs = [];
+      for(weekday = 0; weekday < 7; weekday++) {
+        if(mostPurchased[weekday] != -1) {
+          topDayExpenses.push(expenseDayNames[weekday][mostPurchased[weekday]]);
+          finalFreqs.push(expenseDayFreqs[weekday][mostPurchased[weekday]]);
+        } else {
+          topDayExpenses.push('-');
+          finalFreqs.push('-');
+        }
       }
 
-      arrayLoc = expenseNames.indexOf(name);
-
-      if(arrayLoc != -1) {
-        expenseTotals[arrayLoc] += expenses[i].price;
-      } else {
-        expenseNames.push(name);
-        expenseTotals.push(expenses[i].price);
+      let topExpenses = [];
+      let topCosts = [];
+      let max
+      for(let j = 0; j < 5; j++) {
+        if (expenseNames === undefined || expenseNames.length == 0) {
+          topExpenses.push('-');
+          topCosts.push('-');
+        } else {
+          let max = Math.max.apply(Math, expenseTotals);
+          let index = expenseTotals.indexOf(max);
+          topExpenses.push(expenseNames[index]);
+          topCosts.push(expenseTotals[index]);
+          expenseNames.splice(index, 1);
+          expenseTotals.splice(index, 1);
+        }
       }
-    }
 
-    let topDayExpenses = [];
-    let finalFreqs = [];
-    for(weekday = 0; weekday < 7; weekday++) {
-      if(mostPurchased[weekday] != -1) {
-        topDayExpenses.push(expenseDayNames[weekday][mostPurchased[weekday]]);
-        finalFreqs.push(expenseDayFreqs[weekday][mostPurchased[weekday]]);
-      } else {
-        topDayExpenses.push('-');
-        finalFreqs.push('-');
+      con.end();
+
+      for(let a = 0; a < expenseDayNames.length; a++) {
+        for(let b = 0; b < expenseDayNames[a].length; b++) {
+          console.log(expenseDayNames[a][b]);
+        }
       }
-    }
-
-    let topExpenses = [];
-    let topCosts = [];
-    let max
-    for(let j = 0; j < 5; j++) {
-      if (expenseNames === undefined || expenseNames.length == 0) {
-        topExpenses.push('-');
-        topCosts.push('-');
-      } else {
-        let max = Math.max.apply(Math, expenseTotals);
-        let index = expenseTotals.indexOf(max);
-        topExpenses.push(expenseNames[index]);
-        topCosts.push(expenseTotals[index]);
-        expenseNames.splice(index, 1);
-        expenseTotals.splice(index, 1);
-      }
-    }
-
-    con.end();
-
-    for(let a = 0; a < expenseDayNames.length; a++) {
-      for(let b = 0; b < expenseDayNames[a].length; b++) {
-        console.log(expenseDayNames[a][b]);
-      }
-    }
-
-    return res.render('platform/expense-analytics.hbs', {
-      expense0: topDayExpenses[0],
-      expense1: topDayExpenses[1],
-      expense2: topDayExpenses[2],
-      expense3: topDayExpenses[3],
-      expense4: topDayExpenses[4],
-      expense5: topDayExpenses[5],
-      expense6: topDayExpenses[6],
-      expenseFrequency0: finalFreqs[0],
-      expenseFrequency1: finalFreqs[1],
-      expenseFrequency2: finalFreqs[2],
-      expenseFrequency3: finalFreqs[3],
-      expenseFrequency4: finalFreqs[4],
-      expenseFrequency5: finalFreqs[5],
-      expenseFrequency6: finalFreqs[6],
-      expenseName1: topExpenses[0],
-      expenseName2: topExpenses[1],
-      expenseName3: topExpenses[2],
-      expenseName4: topExpenses[3],
-      expenseName5: topExpenses[4],
-      expenseCost1: topCosts[0],
-      expenseCost2: topCosts[1],
-      expenseCost3: topCosts[2],
-      expenseCost4: topCosts[3],
-      expenseCost5: topCosts[4],
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
-      username: req.user.username,
-      pageName: 'Expense Analytics',
+      return res.render('platform/expense-analytics.hbs', {
+        expense0: topDayExpenses[0],
+        expense1: topDayExpenses[1],
+        expense2: topDayExpenses[2],
+        expense3: topDayExpenses[3],
+        expense4: topDayExpenses[4],
+        expense5: topDayExpenses[5],
+        expense6: topDayExpenses[6],
+        expenseFrequency0: finalFreqs[0],
+        expenseFrequency1: finalFreqs[1],
+        expenseFrequency2: finalFreqs[2],
+        expenseFrequency3: finalFreqs[3],
+        expenseFrequency4: finalFreqs[4],
+        expenseFrequency5: finalFreqs[5],
+        expenseFrequency6: finalFreqs[6],
+        expenseName1: topExpenses[0],
+        expenseName2: topExpenses[1],
+        expenseName3: topExpenses[2],
+        expenseName4: topExpenses[3],
+        expenseName5: topExpenses[4],
+        expenseCost1: topCosts[0],
+        expenseCost2: topCosts[1],
+        expenseCost3: topCosts[2],
+        expenseCost4: topCosts[3],
+        expenseCost5: topCosts[4],
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        username: req.user.username,
+        pageName: 'Expense Analytics',
+        limit: usersArray[0].limitExpense,
+        error: req.flash('error'),
+        success: req.flash('success')
+      });
     });
   });
 });
