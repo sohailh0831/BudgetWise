@@ -457,27 +457,29 @@ router.get('/categories', AuthenticationFunctions.ensureAuthenticated, (req, res
       lastName: req.user.lastName,
       username: req.user.username,
       pageName: 'Categories',
+      error: req.flash('error'),
+      success: req.flash('success')
     });
   });
 });
 
 router.post('/categories', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  let con = mysql.createConnection(dbInfo);
-  con.query(`SELECT * FROM categories WHERE owner=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+  let con = mysql.createConnection({host: "localhost", user: "root", password: "BudgetWise1234!", database : 'budgetwise', multipleStatements: true});
+  con.query(`SELECT * FROM categories WHERE owner=${mysql.escape(req.user.identifier)};`, (error, categories, fields) => {
     if (error) {
         console.log(error.stack);
         con.end();
         return res.send();
-    } else if (results.length < 1) {
+    } else if (categories.length < 1) {
       console.log(error.stack);
       con.end();
       return res.send();
     }
 
-    let catStr = results[0].name;
-    for(let i = 1; i < results.length; i++) {
+    let catStr = categories[0].name;
+    for(let i = 1; i < categories.length; i++) {
       catStr = catStr.concat(',');
-      catStr = catStr.concat(results[i].name);
+      catStr = catStr.concat(categories[i].name);
     }
 
     function getSum(total, num) {
@@ -486,26 +488,27 @@ router.post('/categories', AuthenticationFunctions.ensureAuthenticated, (req, re
 
     let ratios = req.body.ratios.split(",");
     ratios = ratios.map(Number);
-    if(ratios.length != results.length || ratios.reduce(getSum) != 100) {
+    if(ratios.length != categories.length || ratios.reduce(getSum) != 100) {
       req.flash('error', 'Please assign a value to each category such that the sum of all assigned values is 100');
-      //THIS LOOP RUNS, BUT THE FLASH ABOVE DOESN'T WORK
       con.end();
-      return res.render('platform/categories.hbs', {
-        categories: catStr,
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-        username: req.user.username,
-        pageName: 'Categories',
+      return res.redirect('/categories');
+    }
+
+    for(let i = 0; i < categories.length; i++) {
+      console.log(categories[i].name);
+      console.log(ratios[i]);
+      con.query(`UPDATE categories SET name=${mysql.escape(categories[i].name)}, spendPercent=${mysql.escape(ratios[i])} WHERE id=${mysql.escape(categories[i].id)};`, (error, results, fields) => {
+        if (error) {
+            console.log(error.stack);
+            con.end();
+            return res.send();
+        }
       });
     }
 
-    return res.render('platform/categories.hbs', {
-      categories: catStr,
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
-      username: req.user.username,
-      pageName: 'Categories',
-    });
+    req.flash('success', 'Spending ratios successfully updated.');
+    con.end();
+    return res.redirect('/categories');
   });
 });
 
