@@ -38,6 +38,7 @@
 									</div>
 
 									<!--begin::Form-->
+                  <form class="m-form">
 										<div class="m-portlet__body">
 											<div class="m-form__section m-form__section--first">
 												<div class="form-group m-form__group">
@@ -67,7 +68,12 @@
 												</div>
 											</div>
 										</div>
-
+                    <div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions m-form__actions">
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete-profile-modal">Delete BudgetWise Profile</button>
+											</div>
+										</div>
+                  </form>
 									<!--end::Form-->
 								</div>
 
@@ -170,6 +176,15 @@
 													<label>Confirm New Password</label>
 													<input type="password" name="newPassword2" class="form-control m-input">
 												</div>
+                        <label class="col-form-label">Notifications</label>
+																<div>
+																	<span class="m-switch m-switch--outline m-switch--icon m-switch--warning">
+																		<label>
+																			<input type="checkbox" name="parentNotifications" {{#if user.parent_notifications}}checked="checked"{{/if}}>
+																			<span></span>
+																		</label>
+																	</span>
+																</div>
 											</div>
 										</div>
                     <div class="m-portlet__foot m-portlet__foot--fit">
@@ -237,6 +252,51 @@
 
 
 
+     <div class="col-lg-3">
+
+								<!--begin::Portlet-->
+								<div class="m-portlet">
+									<div class="m-portlet__head">
+										<div class="m-portlet__head-caption">
+											<div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+												<h3 class="m-portlet__head-text">
+													Lock Account (Only Parent Account Can Unlock)
+												</h3>
+											</div>
+										</div>
+									</div>
+
+									<!--begin::Form-->
+                  <form class="m-form" action="/settingslocked" method="post">
+										<div class="m-portlet__body">
+											<div class="m-form__section m-form__section--first">
+												<label class="col-form-label"></label>
+																<div>
+																	<span class="m-switch m-switch--outline m-switch--icon m-switch--warning">
+																		<label>
+                                     <a href="/settingsunlocked" class="btn btn-primary">Unlock Account</a>
+                                     <a href="/settingslocked" class="btn btn-danger">Lock Account</a>
+																			<span></span>
+																		</label>
+																	</span>
+																</div>
+											</div>
+										</div>
+                    <div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions m-form__actions">
+											</div>
+										</div>
+                  </form>
+									<!--end::Form-->
+								</div>
+
+								<!--end::Portlet-->
+							</div>
+
+
 
 						</div>
 
@@ -245,4 +305,30 @@
 						<!--End::Main Portlet-->
 					</div>
 				</div>
+        
+        <div class="modal fade" id="delete-profile-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form action="/user/delete-profile" method="post">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="exampleModalLabel">Delete your BudgetWise Profile</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<p>Please only proceed if you'd like to delete your BudgetWise Profile. Once deleted, all data is lost and unrecoverable.</p>
+                    <div class="form-group">
+												<label for="password" class="form-control-label">Password:</label>
+												<input type="password" name="password" class="form-control m-input" placeholder="Enter your BudgwtWise password">
+											</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+										<button type="submit" class="btn btn-danger">Delete</button>
+									</div>
+								</div>
+							</div>
+						</div>
+            </form>
 			{{> footer}}
