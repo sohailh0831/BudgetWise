@@ -1,3 +1,4 @@
+@@ -1,1495 +0,0 @@
 const express = require('express');
 const _ = require('lodash');
 const session = require('express-session');
@@ -127,7 +128,7 @@ router.post('/dashboard/addmemo', AuthenticationFunctions.ensureAuthenticated, (
     if (formErrors) {
 		    req.flash('error', formErrors[0].msg);
         return res.redirect('/dashboard');
-	  } 
+	  }
   let con = mysql.createConnection(dbInfo);
   con.query(`UPDATE users SET memo = ${mysql.escape(memoin)} WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
@@ -138,7 +139,7 @@ router.post('/dashboard/addmemo', AuthenticationFunctions.ensureAuthenticated, (
     con.end();
     req.flash('success', 'Memo successfully updated.');
     return res.redirect('/dashboard');
-  }); 
+  });
 });
 
 
@@ -256,15 +257,15 @@ con.query(`UPDATE users SET locked =0 WHERE users.id = ${mysql.escape(req.user.i
 });
 
 router.get('/settingslocked', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  
+
   /*
   if(req.user.parental_username === undefined){
      req.flash('error', 'No Parent Account');
       return res.redirect('/settings');
-  }                                       //Dont know how to get parental_username 
+  }                                       //Dont know how to get parental_username
    */
-  
-  
+
+
     let con = mysql.createConnection(dbInfo);
     con.query(`SELECT * FROM users WHERE id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
@@ -278,7 +279,7 @@ router.get('/settingslocked', AuthenticationFunctions.ensureAuthenticated, (req,
      req.flash('error', 'No Parent Account');
       return res.redirect('/settings');
   }
-      
+
       con.query(`UPDATE users SET locked =1 WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
         console.log(error.stack);
@@ -288,11 +289,11 @@ router.get('/settingslocked', AuthenticationFunctions.ensureAuthenticated, (req,
       req.flash('success', 'Locked Account');
       return res.redirect('/logout');
     });
-      
-      
-      
+
+
+
     });
- 
+
 });
 
 
@@ -470,7 +471,7 @@ router.post('/dashboard/add-expense', AuthenticationFunctions.ensureAuthenticate
                 }
               });
             });
-            
+
           }
         }).catch(error => {
           console.log(error);
@@ -494,7 +495,7 @@ router.get('/categories', AuthenticationFunctions.ensureAuthenticated, (req, res
     }
     con.end();
     let catStr = '';
-    
+
     if(results.length > 0) {
       catStr = results[0].name;
       for(let i = 1; i < results.length; i++) {
@@ -502,7 +503,7 @@ router.get('/categories', AuthenticationFunctions.ensureAuthenticated, (req, res
         catStr = catStr.concat(results[i].name);
       }
     }
-    
+
     return res.render('platform/categories.hbs', {
       categories: catStr,
       firstName: req.user.firstName,
@@ -527,17 +528,17 @@ router.post('/categories', AuthenticationFunctions.ensureAuthenticated, (req, re
       con.end();
       return res.send();
     }
-    
+
     let catStr = categories[0].name;
     for(let i = 1; i < categories.length; i++) {
       catStr = catStr.concat(',');
       catStr = catStr.concat(categories[i].name);
     }
-    
+
     function getSum(total, num) {
       return total + num;
     }
-    
+
     let ratios = req.body.ratios.split(",");
     ratios = ratios.map(Number);
     if(ratios.length != categories.length || ratios.reduce(getSum) != 100) {
@@ -545,7 +546,7 @@ router.post('/categories', AuthenticationFunctions.ensureAuthenticated, (req, re
       con.end();
       return res.redirect('/categories');
     }
-    
+
     for(let i = 0; i < categories.length; i++) {
       con.query(`UPDATE categories SET name=${mysql.escape(categories[i].name)}, spendPercent=${mysql.escape(ratios[i])} WHERE id=${mysql.escape(categories[i].id)};`, (error, results, fields) => {
         if (error) {
@@ -555,7 +556,7 @@ router.post('/categories', AuthenticationFunctions.ensureAuthenticated, (req, re
         }
       });
     }
-    
+
     req.flash('success', 'Spending ratios successfully updated.');
     con.end();
     return res.redirect('/categories');
@@ -584,14 +585,14 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
               con.end();
               return res.send();
           }
-          
+
           function getSum(total, num) {
             return total + num;
           }
-          
+
           let under = '';
           let over = '';
-          
+
           let catTotals = [];
 
           for(let i = 0; i < categories.length; i++) {
@@ -617,9 +618,9 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
               }
             }
           }
-          
+
           let percentDiffs = [];
-          
+
           for(let i = 0; i < catTotals.length; i++) {
             let catPercentOfTotal = catTotals[i] / catTotals.reduce(getSum) * 100;
             catPercentOfTotal = Math.round(catPercentOfTotal * 100) / 100;
@@ -728,7 +729,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
           labels: []
      };
      let data = [];
-  
+
   BudgetFunctions.getCategoriesByUser(req.user.identifier)
   .then(categories => {
         for (let i = 0; i < dates.length; i++) {
@@ -758,7 +759,7 @@ router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensu
     console.log(error);
     return res.send();
   });
- 
+
 });
 
 
@@ -776,7 +777,7 @@ router.post('/categories/get-user-categories', AuthenticationFunctions.ensureAut
   });
 });
 
-router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {  
+router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
   return res.render('platform/view-category.hbs', {
     firstName: req.user.firstName,
@@ -785,10 +786,10 @@ router.get('/category/:id', AuthenticationFunctions.ensureAuthenticated, (req, r
       pageName: 'Viewing Category',
       error: req.flash('error'),
       success: req.flash('success'),
-  }); 
+  });
 });
 
-router.post('/category-expenses/:id', (req, res) => {  
+router.post('/category-expenses/:id', (req, res) => {
   let con = mysql.createConnection(dbInfo);
   con.query(`SELECT * FROM expenses WHERE category=${mysql.escape(req.params.id)} AND user=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
@@ -828,7 +829,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < expenses.length; j++) {
             sum += expenses[j].price;
           }
-          
+
           let lastYear = new Date();
           lastYear.setDate(lastYear.getDate()-365);
           let year = [];
@@ -841,7 +842,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < year.length; j++) {
             ySum += year[j].price;
           }
-          
+
           let lastMonth = new Date();
           lastMonth.setDate(lastMonth.getDate()-30);
           let month = [];
@@ -854,7 +855,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
           for (let j = 0; j < month.length; j++) {
             mSum += month[j].price;
           }
-          
+
           con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
             if (error) {
               console.log(error.stack);
@@ -866,7 +867,7 @@ router.get('/retirement', AuthenticationFunctions.ensureAuthenticated, (req, res
               return res.send();
             } else {
               retirementGoal = results[0].retirementGoal;
-              
+
               let goal = retirementGoal - sum;
               if(goal < 0) {
                 goal = 0;
@@ -934,8 +935,14 @@ router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (r
       if(arrayLoc == -1) {
         expenseDayNames[dayVal].push(name);
         expenseDayFreqs[dayVal].push(1);
+        arrayLoc = expenseDayNames[dayVal].indexOf(name);
       } else {
         expenseDayFreqs[dayVal][arrayLoc] += 1;
+      }
+
+      let mostIndex = mostPurchased[dayVal];
+      if(mostIndex == -1 || expenseDayFreqs[dayVal][mostIndex] < expenseDayFreqs[dayVal][arrayLoc]) {
+        mostPurchased[dayVal] = arrayLoc;
       }
 
       arrayLoc = expenseNames.indexOf(name);
@@ -945,11 +952,6 @@ router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (r
       } else {
         expenseNames.push(name);
         expenseTotals.push(expenses[i].price);
-      }
-
-      let mostIndex = mostPurchased[dayVal];
-      if(mostIndex == -1 || expenseDayFreqs[dayVal][mostIndex] < expenseDayFreqs[dayVal][arrayLoc]) {
-         mostPurchased[dayVal] = arrayLoc;
       }
     }
 
@@ -979,12 +981,16 @@ router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (r
         topCosts.push(expenseTotals[index]);
         expenseNames.splice(index, 1);
         expenseTotals.splice(index, 1);
-        console.log(topExpenses[j]);
       }
     }
-    console.log(topExpenses[0]);
 
     con.end();
+
+    for(let a = 0; a < expenseDayNames.length; a++) {
+      for(let b = 0; b < expenseDayNames[a].length; b++) {
+        console.log(expenseDayNames[a][b]);
+      }
+    }
 
     return res.render('platform/expense-analytics.hbs', {
       expense0: topDayExpenses[0],
