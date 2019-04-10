@@ -1,4 +1,3 @@
-@@ -1,1495 +0,0 @@
 const express = require('express');
 const _ = require('lodash');
 const session = require('express-session');
@@ -59,6 +58,7 @@ router.get('/dashboard', AuthenticationFunctions.ensureAuthenticated, (req, res)
           username: req.user.username,
           pageName: 'Dashboard',
           memo: user[0].memo,
+          limit: user[0].limitExpense,
         });
       });
     });
@@ -138,6 +138,27 @@ router.post('/dashboard/addmemo', AuthenticationFunctions.ensureAuthenticated, (
     }
     con.end();
     req.flash('success', 'Memo successfully updated.');
+    return res.redirect('/dashboard');
+  });
+});
+
+router.post('/dashboard/addlimit', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let limitin = req.body.limitInput;
+  req.checkBody('limitInput', 'Cannot save empty limit').notEmpty();
+  let formErrors = req.validationErrors();
+    if (formErrors) {
+		    req.flash('error', formErrors[0].msg);
+        return res.redirect('/dashboard');
+	  }
+  let con = mysql.createConnection(dbInfo);
+  con.query(`UPDATE users SET limitExpense = ${mysql.escape(limitin)} WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+    }
+    con.end();
+    req.flash('success', 'Limit successfully updated.');
     return res.redirect('/dashboard');
   });
 });
@@ -238,6 +259,19 @@ con.query(`UPDATE users SET memo = "" WHERE users.id = ${mysql.escape(req.user.i
         return res.send();
     }
       req.flash('success', 'Deleted Memo.');
+      return res.redirect('/dashboard');
+    });
+});
+
+router.get('/dashboard/deletelimit', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+con.query(`UPDATE users SET limitExpense = "" WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+    if (error) {
+        console.log(error.stack);
+        con.end();
+        return res.send();
+    }
+      req.flash('success', 'Deleted Limit.');
       return res.redirect('/dashboard');
     });
 });
