@@ -1049,11 +1049,17 @@ router.get('/expense-analytics', AuthenticationFunctions.ensureAuthenticated, (r
         if (expenseNames === undefined || expenseNames.length == 0) {
           topExpenses.push('-');
           topCosts.push('-');
-        } else {
+        }
+        else {
           let max = Math.max.apply(Math, expenseTotals);
           let index = expenseTotals.indexOf(max);
-          topExpenses.push(expenseNames[index]);
-          topCosts.push(expenseTotals[index]);
+          if(usersArray[0].limitExpense > 0 && expenseTotals[index] > usersArray[0].limitExpense) {
+            j--;
+          }
+          else {
+            topExpenses.push(expenseNames[index]);
+            topCosts.push(expenseTotals[index]);
+          }
           expenseNames.splice(index, 1);
           expenseTotals.splice(index, 1);
         }
