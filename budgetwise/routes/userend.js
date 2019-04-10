@@ -639,7 +639,37 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
               over = over.concat(categories[i].spendPercent)
               over = over.concat('\n');
             }
+            percentDiffs[i] = catPercentOfTotal - categories[i].spendPercent;
           }
+
+          var min = percentDiffs[0];
+          var minIndex = 0;
+          var max = percentDiffs[0];
+          var maxIndex = 0;
+
+          for (var i = 1; i < percentDiffs.length; i++) {
+              if (percentDiffs[i] > max) {
+                  maxIndex = i;
+                  max = percentDiffs[i];
+              }
+              if (percentDiffs[i] < min) {
+                  minIndex = i;
+                  min = percentDiffs[i];
+              }
+          }
+
+          let recom = "The category where you have overspent the most according to your set spending ratios is ";
+          recom = recom.concat(categories[maxIndex].name);
+          recom = recom.concat(". You have spent ");
+          recom = recom.concat(percentDiffs[maxIndex]);
+          recom = recom.concat("% more on this category that you planned to compared to how much you have spent so far for this budget.");
+          recom = recom.concat("\n\n");
+          recom = recom.concat("The category where you have underspent the most according to your set spending ratios is ");
+          recom = recom.concat(categories[minIndex].name);
+          recom = recom.concat(". You have spent ");
+          recom = recom.concat(percentDiffs[minIndex]*-1);
+          recom = recom.concat("% less on this category that you planned to compared to how much you have spent so far for this budget.");
+          recom = recom.concat("\n\n");
 
           con.end();
 
@@ -647,6 +677,7 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
             budget: budgets[0],
             underSpending: under,
             overSpending: over,
+            recommendation: recom,
             firstName: req.user.firstName,
             lastName: req.user.lastName,
             username: req.user.username,
