@@ -105,386 +105,386 @@ function randomQuote() {
 	document.write(quotes[Math.floor(Math.random()*quotes.length)]);
 }
 </script>
-<div class="m-grid__item m-grid__item--fluid m-wrapper">
+				<div class="m-grid__item m-grid__item--fluid m-wrapper">
 
-	<div class="m-content">
-		{{#if error}}
-		<div class="alert alert-danger alert-dismissible fade show" role="alert">
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-			</button>
-			<strong>Oh snap!</strong> {{error}}
-		</div>
-		{{/if}}
-		{{#if success}}
-		<div class="alert alert-success alert-dismissible fade show" role="alert">
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-			</button>
-			<strong>Success!</strong> {{success}}
-		</div>
-		{{/if}}
+					<div class="m-content">
+						{{#if error}}
+						<div class="alert alert-danger alert-dismissible fade show" role="alert">
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							</button>
+							<strong>Oh snap!</strong> {{error}}
+						</div>
+						{{/if}}
+            {{#if success}}
+						<div class="alert alert-success alert-dismissible fade show" role="alert">
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							</button>
+							<strong>Success!</strong> {{success}}
+						</div>
+						{{/if}}
 
-<div class="row">
-		<div class="col-lg-12">
-			<div class="m-portlet m-portlet--mobile">
-				<div class="m-portlet__head">
-				<div class="m-portlet__head-caption">
-					<div class="m-portlet__head-title">
-						<h3 class="m-portlet__head-text">
-							Motivational Quotes
-						</h3>
+        <div class="row">
+            <div class="col-lg-12">
+              <div class="m-portlet m-portlet--mobile">
+                <div class="m-portlet__head">
+								<div class="m-portlet__head-caption">
+									<div class="m-portlet__head-title">
+										<h3 class="m-portlet__head-text">
+											Motivational Quotes
+										</h3>
+									</div>
+								</div>
+							</div>
+              <div class="m-portlet__body">
+								<h1><script>randomQuote()</script></h1>
+							</div>
+						</div>
+            </div>
+            </div>
+            
+            
+            
+                 <div class="row">
+            <div class="col-lg-12">
+              <div class="m-portlet m-portlet--mobile">
+                <div class="m-portlet__head">
+								<div class="m-portlet__head-caption">
+									<div class="m-portlet__head-title">
+										<h3 class="m-portlet__head-text">
+											MemoPad
+										</h3>
+									</div>
+								</div>
+							</div>
+              <div class="m-portlet__body">
+								<h1>
+                  <form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/addmemo" method="post">
+                  <div class="form-group m-form__group">
+												<label>Memo</label>
+                        {{#if memo}}
+                        <input type="text" class="form-control m-input m-input--square" name="memoInput" value="{{memo}}">
+                        {{else}}
+                        <input type="text" class="form-control m-input m-input--square" name="memoInput" placeholder="Enter Memo Here">
+                        {{/if}}
+											</div>
+                      <div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Save Memo</button>
+                        <a href="/dashboard/deletememo" class="btn btn-danger">Delete</a>
+											</div>
+										</div>
+									</form>             
+                </h1>
+							</div>
+						</div>
+            </div>
+            </div>
+
+
+            <div class="row">
+            <div class="col-lg-12">
+            <div class="m-portlet m-portlet--mobile">
+							<div class="m-portlet__head">
+								<div class="m-portlet__head-caption">
+									<div class="m-portlet__head-title">
+										<h3 class="m-portlet__head-text">
+											Budgets
+										</h3>
+									</div>
+								</div>
+							</div>
+							<div class="m-portlet__body">
+
+								<!--begin: Datatable -->
+								<div class="m_datatableBudgets" id=""></div>
+
+								<!--end: Datatable -->
+							</div>
+						</div>
+            </div>
+            </div>
+
+
+
+
+
+						<div class="row">
+
+
+
+              <div class="col-lg-3">
+
+                <div class="m-portlet m-portlet--tab">
+									<div class="m-portlet__head">
+										<div class="m-portlet__head-caption">
+											<div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+												<h3 class="m-portlet__head-text">
+													Enter a New Expense
+												</h3>
+											</div>
+										</div>
+									</div>
+
+									<!--begin::Form-->
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-expense" method="post">
+										<div class="m-portlet__body">
+											<div class="form-group m-form__group">
+												<label for="exampleSelect1">Category</label>
+												<select class="form-control m-input m-input--square" id="exampleSelect1" name="category">
+                          {{#each categories}}
+                          <option value={{id}}>{{name}}</option>
+                          {{/each}}
+												</select>
+											</div>
+                      <div class="form-group m-form__group">
+												<label for="exampleSelect1">Recurring Expense</label>
+												<select class="form-control m-input m-input--square" id="exampleSelect1" name="recurringExpense">
+													<option value="yes">Yes</option>
+													<option value="no" selected="selected">No</option>
+												</select>
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Recurring Time Frame</label>
+												<input type="text" class="form-control m-input m-input--square" name="recurringTime" placeholder="Recurring every X DAYS">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Recurring Expense End Date (YYYY-MM-DD)</label>
+												<input type="date" class="form-control m-input m-input--square" name="recurringEndDate" placeholder="Recurring Expense End Date (YYYY-MM-DD)">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Expense Name</label>
+												<input type="text" class="form-control m-input m-input--square" name="expenseName" placeholder="Expense Name">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Expense Price</label>
+												<input type="text" class="form-control m-input m-input--square" name="expensePrice" placeholder="Expense Price">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Expense Review</label>
+												<input type="text" class="form-control m-input m-input--square" name="expenseDescription" placeholder="Expense Review">
+											</div>
+										</div>
+										<div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Add Expense</button>
+											</div>
+										</div>
+									</form>
+
+									<!--end::Form-->
+								</div>
+
+
+							</div>
+
+
+
+							<div class="col-lg-3">
+
+                <div class="m-portlet m-portlet--tab">
+									<div class="m-portlet__head">
+										<div class="m-portlet__head-caption">
+											<div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+												<h3 class="m-portlet__head-text">
+													Create a Budget
+												</h3>
+											</div>
+										</div>
+									</div>
+
+									<!--begin::Form-->
+                  <form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-monthly-budget" method="post">
+										<div class="m-portlet__body">
+                      <div class="form-group m-form__group">
+												<label>Monthly Budget Allowance</label>
+												<input type="number" class="form-control m-input m-input--square" name="monthlyBudgetAllowance" placeholder="Monthly Budget Allowance">
+											</div>
+										</div>
+										<div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Create Monthly Budget</button>
+											</div>
+										</div>
+									</form>
+                  <div class="m-portlet__foot m-portlet__foot--fit"></div>
+
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-budget" method="post">
+										<div class="m-portlet__body">
+                      <div class="form-group m-form__group">
+												<label>Budget Name</label>
+												<input type="text" class="form-control m-input m-input--square" name="budgetName" placeholder="Budget Name">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Budget Allowance</label>
+												<input type="number" class="form-control m-input m-input--square" name="budgetAllowance" placeholder="Budget Allowance">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Budget Start Date (YYYY-MM-DD)</label>
+												<input type="date" class="form-control m-input m-input--square" name="startDate" placeholder="Start Date (YYYY-MM-DD)">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Budget End Date (YYYY-MM-DD)</label>
+												<input type="date" class="form-control m-input m-input--square" name="endDate" placeholder="End Date (YYYY-MM-DD)">
+											</div>
+										</div>
+										<div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Create Budget</button>
+											</div>
+										</div>
+									</form>
+
+									<!--end::Form-->
+								</div>
+
+
+							</div>
+
+
+
+
+
+
+
+              <div class="col-lg-3">
+
+                <div class="m-portlet m-portlet--tab">
+									<div class="m-portlet__head">
+										<div class="m-portlet__head-caption">
+											<div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+												<h3 class="m-portlet__head-text">
+													Create a Category
+												</h3>
+											</div>
+										</div>
+									</div>
+
+									<!--begin::Form-->
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-category" method="post">
+										<div class="m-portlet__body">
+                    <div class="form-group m-form__group">
+												<label for="exampleSelect2">Categories</label>
+												<select multiple="" class="form-control m-input" id="exampleSelect2" disabled="true">
+													{{#each categories}}
+                          <option>{{name}}</option>
+                          {{/each}}
+												</select>
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Category Name</label>
+												<input type="text" class="form-control m-input m-input--square" name="categoryName" placeholder="Category Name">
+											</div>
+										</div>
+										<div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Create Category</button>
+											</div>
+										</div>
+									</form>
+
+
+									<!--end::Form-->
+								</div>
+
+
+							</div>
+
+
+              <div class="col-lg-3">
+
+                <div class="m-portlet m-portlet--tab">
+									<div class="m-portlet__head">
+										<div class="m-portlet__head-caption">
+											<div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+												<h3 class="m-portlet__head-text">
+													Create Christmas Budget
+												</h3>
+											</div>
+										</div>
+									</div>
+
+									<!--begin::Form-->
+                  <form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-christmas-budget" method="post">
+										<div class="m-portlet__body">
+                      <div class="form-group m-form__group">
+												<label>Christmas Budget Name</label>
+												<input type="text" required="true" class="form-control m-input m-input--square" name="budgetName" placeholder="Budget Name">
+											</div>
+                      <div class="form-group m-form__group">
+												<label>Christmas Budget Allowance</label>
+												<input type="number" required="true" class="form-control m-input m-input--square" name="budgetAllowance" placeholder="Budget Allowance">
+											</div>
+										</div>
+										<div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Create Budget</button>
+                        <a href="/dashboard/delete-christmas-budget" class="btn btn-danger">Delete</a>
+											</div>
+										</div>
+									</form>
+                  <div class="m-portlet__foot m-portlet__foot--fit"></div>
+
+                  <!--begin::Form-->
+                  <form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-christmas-expense" method="post">
+										<div class="m-portlet__body">
+                      <div class="form-group m-form__group">
+												<label>Expense Price</label>
+												<input type="number" required="true" class="form-control m-input m-input--square" name="expensePrice" placeholder="Expense Price">
+											</div>
+                      <div class="form-group m-form__group">
+												<label for="exampleSelect2">Individual</label>
+												<select class="form-control m-input" name="individualChoice" id="exampleSelect2">
+													{{#each individuals}}
+                          <option value="{{id}}">{{name}}</option>
+                          {{/each}}
+												</select>
+											</div>
+										</div>
+										<div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Add Expense</button>
+											</div>
+										</div>
+									</form>
+                  <div class="m-portlet__foot m-portlet__foot--fit"></div>
+
+									<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-individual-to-christmas-budget" method="post">
+										<div class="m-portlet__body">
+                      <div class="form-group m-form__group">
+												<label>Individual Name</label>
+												<input type="text" class="form-control m-input m-input--square" name="individualName" placeholder="Individual Name">
+											</div>
+										</div>
+										<div class="m-portlet__foot m-portlet__foot--fit">
+											<div class="m-form__actions">
+												<button type="submit" class="btn btn-primary">Add Indiviudal</button>
+											</div>
+										</div>
+									</form>
+
+									<!--end::Form-->
+								</div>
+
+
+							</div>
+
+
+						</div>
+
+
+						<!--End::Main Portlet-->
 					</div>
 				</div>
-			</div>
-			<div class="m-portlet__body">
-				<h1><script>randomQuote()</script></h1>
-			</div>
-		</div>
-		</div>
-		</div>
-
-
-
-				 <div class="row">
-		<div class="col-lg-12">
-			<div class="m-portlet m-portlet--mobile">
-				<div class="m-portlet__head">
-				<div class="m-portlet__head-caption">
-					<div class="m-portlet__head-title">
-						<h3 class="m-portlet__head-text">
-							MemoPad
-						</h3>
-					</div>
-				</div>
-			</div>
-			<div class="m-portlet__body">
-				<h1>
-					<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/addmemo" method="post">
-					<div class="form-group m-form__group">
-								<label>Memo</label>
-								{{#if memo}}
-								<input type="text" class="form-control m-input m-input--square" name="memoInput" value="{{memo}}">
-								{{else}}
-								<input type="text" class="form-control m-input m-input--square" name="memoInput" placeholder="Enter Memo Here">
-								{{/if}}
-							</div>
-							<div class="m-portlet__foot m-portlet__foot--fit">
-							<div class="m-form__actions">
-								<button type="submit" class="btn btn-primary">Save Memo</button>
-								<a href="/dashboard/deletememo" class="btn btn-danger">Delete</a>
-							</div>
-						</div>
-					</form>
-				</h1>
-			</div>
-		</div>
-		</div>
-		</div>
-
-
-		<div class="row">
-		<div class="col-lg-12">
-		<div class="m-portlet m-portlet--mobile">
-			<div class="m-portlet__head">
-				<div class="m-portlet__head-caption">
-					<div class="m-portlet__head-title">
-						<h3 class="m-portlet__head-text">
-							Budgets
-						</h3>
-					</div>
-				</div>
-			</div>
-			<div class="m-portlet__body">
-
-				<!--begin: Datatable -->
-				<div class="m_datatableBudgets" id=""></div>
-
-				<!--end: Datatable -->
-			</div>
-		</div>
-		</div>
-		</div>
-
-
-
-
-
-		<div class="row">
-
-
-
-			<div class="col-lg-3">
-
-				<div class="m-portlet m-portlet--tab">
-					<div class="m-portlet__head">
-						<div class="m-portlet__head-caption">
-							<div class="m-portlet__head-title">
-								<span class="m-portlet__head-icon m--hide">
-									<i class="la la-gear"></i>
-								</span>
-								<h3 class="m-portlet__head-text">
-									Enter a New Expense
-								</h3>
-							</div>
-						</div>
-					</div>
-
-					<!--begin::Form-->
-					<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-expense" method="post">
-						<div class="m-portlet__body">
-							<div class="form-group m-form__group">
-								<label for="exampleSelect1">Category</label>
-								<select class="form-control m-input m-input--square" id="exampleSelect1" name="category">
-									{{#each categories}}
-									<option value={{id}}>{{name}}</option>
-									{{/each}}
-								</select>
-							</div>
-							<div class="form-group m-form__group">
-								<label for="exampleSelect1">Recurring Expense</label>
-								<select class="form-control m-input m-input--square" id="exampleSelect1" name="recurringExpense">
-									<option value="yes">Yes</option>
-									<option value="no" selected="selected">No</option>
-								</select>
-							</div>
-							<div class="form-group m-form__group">
-								<label>Recurring Time Frame</label>
-								<input type="text" class="form-control m-input m-input--square" name="recurringTime" placeholder="Recurring every X DAYS">
-							</div>
-							<div class="form-group m-form__group">
-								<label>Recurring Expense End Date (YYYY-MM-DD)</label>
-								<input type="date" class="form-control m-input m-input--square" name="recurringEndDate" placeholder="Recurring Expense End Date (YYYY-MM-DD)">
-							</div>
-							<div class="form-group m-form__group">
-								<label>Expense Name</label>
-								<input type="text" class="form-control m-input m-input--square" name="expenseName" placeholder="Expense Name">
-							</div>
-							<div class="form-group m-form__group">
-								<label>Expense Price</label>
-								<input type="text" class="form-control m-input m-input--square" name="expensePrice" placeholder="Expense Price">
-							</div>
-							<div class="form-group m-form__group">
-								<label>Expense Review</label>
-								<input type="text" class="form-control m-input m-input--square" name="expenseDescription" placeholder="Expense Review">
-							</div>
-						</div>
-						<div class="m-portlet__foot m-portlet__foot--fit">
-							<div class="m-form__actions">
-								<button type="submit" class="btn btn-primary">Add Expense</button>
-							</div>
-						</div>
-					</form>
-
-					<!--end::Form-->
-				</div>
-
-
-			</div>
-
-
-
-			<div class="col-lg-3">
-
-				<div class="m-portlet m-portlet--tab">
-					<div class="m-portlet__head">
-						<div class="m-portlet__head-caption">
-							<div class="m-portlet__head-title">
-								<span class="m-portlet__head-icon m--hide">
-									<i class="la la-gear"></i>
-								</span>
-								<h3 class="m-portlet__head-text">
-									Create a Budget
-								</h3>
-							</div>
-						</div>
-					</div>
-
-					<!--begin::Form-->
-					<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-monthly-budget" method="post">
-						<div class="m-portlet__body">
-							<div class="form-group m-form__group">
-								<label>Monthly Budget Allowance</label>
-								<input type="number" class="form-control m-input m-input--square" name="monthlyBudgetAllowance" placeholder="Monthly Budget Allowance">
-							</div>
-						</div>
-						<div class="m-portlet__foot m-portlet__foot--fit">
-							<div class="m-form__actions">
-								<button type="submit" class="btn btn-primary">Create Monthly Budget</button>
-							</div>
-						</div>
-					</form>
-					<div class="m-portlet__foot m-portlet__foot--fit"></div>
-
-					<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-budget" method="post">
-						<div class="m-portlet__body">
-							<div class="form-group m-form__group">
-								<label>Budget Name</label>
-								<input type="text" class="form-control m-input m-input--square" name="budgetName" placeholder="Budget Name">
-							</div>
-							<div class="form-group m-form__group">
-								<label>Budget Allowance</label>
-								<input type="number" class="form-control m-input m-input--square" name="budgetAllowance" placeholder="Budget Allowance">
-							</div>
-							<div class="form-group m-form__group">
-								<label>Budget Start Date (YYYY-MM-DD)</label>
-								<input type="date" class="form-control m-input m-input--square" name="startDate" placeholder="Start Date (YYYY-MM-DD)">
-							</div>
-							<div class="form-group m-form__group">
-								<label>Budget End Date (YYYY-MM-DD)</label>
-								<input type="date" class="form-control m-input m-input--square" name="endDate" placeholder="End Date (YYYY-MM-DD)">
-							</div>
-						</div>
-						<div class="m-portlet__foot m-portlet__foot--fit">
-							<div class="m-form__actions">
-								<button type="submit" class="btn btn-primary">Create Budget</button>
-							</div>
-						</div>
-					</form>
-
-					<!--end::Form-->
-				</div>
-
-
-			</div>
-
-
-
-
-
-
-
-			<div class="col-lg-3">
-
-				<div class="m-portlet m-portlet--tab">
-					<div class="m-portlet__head">
-						<div class="m-portlet__head-caption">
-							<div class="m-portlet__head-title">
-								<span class="m-portlet__head-icon m--hide">
-									<i class="la la-gear"></i>
-								</span>
-								<h3 class="m-portlet__head-text">
-									Create a Category
-								</h3>
-							</div>
-						</div>
-					</div>
-
-					<!--begin::Form-->
-					<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-category" method="post">
-						<div class="m-portlet__body">
-						<div class="form-group m-form__group">
-								<label for="exampleSelect2">Categories</label>
-								<select multiple="" class="form-control m-input" id="exampleSelect2" disabled="true">
-									{{#each categories}}
-									<option>{{name}}</option>
-									{{/each}}
-								</select>
-							</div>
-							<div class="form-group m-form__group">
-								<label>Category Name</label>
-								<input type="text" class="form-control m-input m-input--square" name="categoryName" placeholder="Category Name">
-							</div>
-						</div>
-						<div class="m-portlet__foot m-portlet__foot--fit">
-							<div class="m-form__actions">
-								<button type="submit" class="btn btn-primary">Create Category</button>
-							</div>
-						</div>
-					</form>
-
-
-					<!--end::Form-->
-				</div>
-
-
-			</div>
-
-
-			<div class="col-lg-3">
-
-				<div class="m-portlet m-portlet--tab">
-					<div class="m-portlet__head">
-						<div class="m-portlet__head-caption">
-							<div class="m-portlet__head-title">
-								<span class="m-portlet__head-icon m--hide">
-									<i class="la la-gear"></i>
-								</span>
-								<h3 class="m-portlet__head-text">
-									Create Christmas Budget
-								</h3>
-							</div>
-						</div>
-					</div>
-
-					<!--begin::Form-->
-					<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-christmas-budget" method="post">
-						<div class="m-portlet__body">
-							<div class="form-group m-form__group">
-								<label>Christmas Budget Name</label>
-								<input type="text" required="true" class="form-control m-input m-input--square" name="budgetName" placeholder="Budget Name">
-							</div>
-							<div class="form-group m-form__group">
-								<label>Christmas Budget Allowance</label>
-								<input type="number" required="true" class="form-control m-input m-input--square" name="budgetAllowance" placeholder="Budget Allowance">
-							</div>
-						</div>
-						<div class="m-portlet__foot m-portlet__foot--fit">
-							<div class="m-form__actions">
-								<button type="submit" class="btn btn-primary">Create Budget</button>
-								<a href="/dashboard/delete-christmas-budget" class="btn btn-danger">Delete</a>
-							</div>
-						</div>
-					</form>
-					<div class="m-portlet__foot m-portlet__foot--fit"></div>
-
-					<!--begin::Form-->
-					<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-christmas-expense" method="post">
-						<div class="m-portlet__body">
-							<div class="form-group m-form__group">
-								<label>Expense Price</label>
-								<input type="number" required="true" class="form-control m-input m-input--square" name="expensePrice" placeholder="Expense Price">
-							</div>
-							<div class="form-group m-form__group">
-								<label for="exampleSelect2">Individual</label>
-								<select class="form-control m-input" name="individualChoice" id="exampleSelect2">
-									{{#each individuals}}
-									<option value="{{id}}">{{name}}</option>
-									{{/each}}
-								</select>
-							</div>
-						</div>
-						<div class="m-portlet__foot m-portlet__foot--fit">
-							<div class="m-form__actions">
-								<button type="submit" class="btn btn-primary">Add Expense</button>
-							</div>
-						</div>
-					</form>
-					<div class="m-portlet__foot m-portlet__foot--fit"></div>
-
-					<form class="m-form m-form--fit m-form--label-align-right" action="/dashboard/add-individual-to-christmas-budget" method="post">
-						<div class="m-portlet__body">
-							<div class="form-group m-form__group">
-								<label>Individual Name</label>
-								<input type="text" class="form-control m-input m-input--square" name="individualName" placeholder="Individual Name">
-							</div>
-						</div>
-						<div class="m-portlet__foot m-portlet__foot--fit">
-							<div class="m-form__actions">
-								<button type="submit" class="btn btn-primary">Add Indiviudal</button>
-							</div>
-						</div>
-					</form>
-
-					<!--end::Form-->
-				</div>
-
-
-			</div>
-
-
-		</div>
-
-
-		<!--End::Main Portlet-->
-	</div>
-</div>
-{{> footer}}
+			{{> footer}}
