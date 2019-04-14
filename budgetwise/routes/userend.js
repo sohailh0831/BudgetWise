@@ -142,7 +142,7 @@ router.post('/dashboard/addmemo', AuthenticationFunctions.ensureAuthenticated, (
   });
 });
 
-router.post('/dashboard/addlimit', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+router.post('/expense-analytics/addlimit', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let limitin = req.body.limitInput;
   req.checkBody('limitInput', 'Cannot save empty limit').notEmpty();
   let formErrors = req.validationErrors();
@@ -263,7 +263,7 @@ con.query(`UPDATE users SET memo = "" WHERE users.id = ${mysql.escape(req.user.i
     });
 });
 
-router.get('/dashboard/deletelimit', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+router.get('/expense-analytics/deletelimit', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
 con.query(`UPDATE users SET limitExpense = 0 WHERE users.id = ${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
     if (error) {
@@ -272,7 +272,7 @@ con.query(`UPDATE users SET limitExpense = 0 WHERE users.id = ${mysql.escape(req
         return res.send();
     }
       req.flash('success', 'Deleted Limit.');
-      return res.redirect('/dashboard');
+      return res.redirect('/expense-analytics');
     });
 });
 
@@ -619,6 +619,16 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
               con.end();
               return res.send();
           }
+          
+          function formatDate(date){
+            var dd = date.getDate();
+            var mm = date.getMonth()+1;
+            var yyyy = date.getFullYear();
+            if(dd<10) {dd='0'+dd}
+            if(mm<10) {mm='0'+mm}
+            date = yyyy+'-'+mm+'-'+dd;
+            return date
+         }
 
           function getSum(total, num) {
             return total + num;
@@ -631,6 +641,8 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
 
           let allow = Math.round(budgets[0].allowance *100 ) / 100;
           let as = Math.round(budgets[0].amountSpent *100 ) / 100;
+          let start = formatDate(budgets[0].startDate);
+          let end = formatDate(budgets[0].endDate);
 
           for(let i = 0; i < categories.length; i++) {
             catTotals.push(0);
@@ -641,6 +653,8 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
                 budget: budgets[0],
                 allowance: allow,
                 amountSpent: as,
+                startDate: start,
+                endDate: end,
                 underSpending: under,
                 overSpending: over,
                 firstName: req.user.firstName,
@@ -667,16 +681,16 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
               under = under.concat(categories[i].name);
               under = under.concat(' - Actual: ');
               under = under.concat(catPercentOfTotal);
-              under = under.concat(' - Allowed: ');
+              under = under.concat('% - Allowed: ');
               under = under.concat(categories[i].spendPercent);
-              under = under.concat('\n');
+              under = under.concat('%\n');
             } else {
               over = over.concat(categories[i].name);
               over = over.concat(' - Actual: ');
               over = over.concat(catPercentOfTotal);
-              over = over.concat(' - Allowed: ');
+              over = over.concat('% - Allowed: ');
               over = over.concat(categories[i].spendPercent)
-              over = over.concat('\n');
+              over = over.concat('%\n');
             }
             percentDiffs[i] = catPercentOfTotal - categories[i].spendPercent;
           }
@@ -714,6 +728,10 @@ router.get('/budgets/:id', AuthenticationFunctions.ensureAuthenticated, (req, re
 
           return res.render('platform/view-budget.hbs', {
             budget: budgets[0],
+            allowance: allow,
+            amountSpent: as,
+            startDate: start,
+            endDate: end,
             underSpending: under,
             overSpending: over,
             recommendation: recom,
@@ -774,60 +792,74 @@ router.post('/budgets/get-user-budgets', AuthenticationFunctions.ensureAuthentic
 
 
 router.get('/budgetss/get-user-spend-per-category', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-     function formatDate(date){
+  let con = mysql.createConnection(dbInfo);
+  function formatDate(date){
 
-        var dd = date.getDate();
-        var mm = date.getMonth()+1;
-        var yyyy = date.getFullYear();
-        if(dd<10) {dd='0'+dd}
-        if(mm<10) {mm='0'+mm}
-        date = yyyy+'-'+mm+'-'+dd;
-        return date
-     }
-    let dates = [];
-    let refDate = new Date();
-    for (let i=refDate.getDate()-1; i>=0; i--) {
-        let d = new Date();
-        d.setDate(d.getDate() - i);
-        dates.push(formatDate(d));
+          var dd = date.getDate();
+          var mm = date.getMonth()+1;
+          var yyyy = date.getFullYear();
+          if(dd<10) {dd='0'+dd}
+          if(mm<10) {mm='0'+mm}
+          date = yyyy+'-'+mm+'-'+dd;
+          return date
+       }
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.identifier)};`, (error, users, fields) => {
+    if (error) {
+      console.log(error.stack);
+      con.end();
+      return res.send();
     }
-    let graph = {
-          element: "m_morris_2",
-          xkey: "y",
-          data: [],
-          ykeys: [],
-          labels: []
-     };
-     let data = [];
+    if (users.length === 1) {
+      let colorsArray = (users[0].category_colors).split(',');
+      let dates = [];
+      let refDate = new Date();
+      for (let i=refDate.getDate()-1; i>=0; i--) {
+          let d = new Date();
+          d.setDate(d.getDate() - i);
+          dates.push(formatDate(d));
+      }
+      let graph = {
+            element: "m_morris_2",
+            xkey: "y",
+            data: [],
+            ykeys: [],
+            labels: [],// changes are done below this
+            lineColors: colorsArray
+      };
+      
+       let data = [];
 
-  BudgetFunctions.getCategoriesByUser(req.user.identifier)
-  .then(categories => {
-        for (let i = 0; i < dates.length; i++) {
-              let obj = {
-                y: dates[i]
-              }
-              data.push(obj);
-              for (let j = 0; j < categories.length; j++) {
-                data[i][categories[j].id] = 0;
-              }
-        }
-        let ykeys = [];
-        let labels = [];
-        for (let i = 0; i < categories.length; i++) {
-          ykeys.push(`${categories[i].id}`);
-          labels.push(categories[i].name);
-        }
-        graph.ykeys = ykeys;
-        graph.labels = labels;
-        graph.data = data;
-        let computationData = BudgetFunctions.buildGraph(data, categories, req.user.identifier, dates[0]);
-        computationData.then(resultData => {
-          graph.data = resultData;
-          return res.send(graph);
-        })
-  }).catch(error => {
-    console.log(error);
-    return res.send();
+    BudgetFunctions.getCategoriesByUser(req.user.identifier)
+    .then(categories => {
+          for (let i = 0; i < dates.length; i++) {
+                let obj = {
+                  y: dates[i]
+                }
+                data.push(obj);
+                for (let j = 0; j < categories.length; j++) {
+                  data[i][categories[j].id] = 0;
+                }
+          }
+          let ykeys = [];
+          let labels = [];
+          for (let i = 0; i < categories.length; i++) {
+            ykeys.push(`${categories[i].id}`);
+            labels.push(categories[i].name);
+          }
+          graph.ykeys = ykeys;
+          graph.labels = labels;
+          graph.data = data;
+          let computationData = BudgetFunctions.buildGraph(data, categories, req.user.identifier, dates[0]);
+          computationData.then(resultData => {
+            graph.data = resultData;
+            con.end();
+            return res.send(graph);
+          })
+    }).catch(error => {
+      console.log(error);
+      return res.send();
+    });
+    }
   });
 
 });
@@ -1579,6 +1611,20 @@ router.post('/settings', AuthenticationFunctions.ensureAuthenticated, (req, res)
 
 router.get(`/old`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   res.render('platform/user-settings-old');
+});
+
+router.post('/settings/change-category-colors', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`UPDATE users SET category_colors=${mysql.escape(req.body.categoryColors)} WHERE id=${mysql.escape(req.user.identifier)};`, (error, results, fields) => {
+    if (error) {
+      console.log(error.stack);
+      con.end();
+      return res.send();
+    }
+    req.flash('success', 'Colors changed');
+    con.end();
+    return res.redirect('/settings');
+  });
 });
 
 
